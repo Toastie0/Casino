@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+bin/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Minecraft Development
+run/
+logs/
+crash-reports/
+
+# Fabric
+remappedSrc/
+
+# Java
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Temporary files
+*.tmp
+*.log

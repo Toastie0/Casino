@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=0": {
+      "model": "playingcards:block/casino_table"
+    },
+    "facing=1": {
+      "model": "playingcards:block/casino_table",
+      "y": 90
+    },
+    "facing=2": {
+      "model": "playingcards:block/casino_table",
+      "y": 180
+    },
+    "facing=3": {
+      "model": "playingcards:block/casino_table",
+      "y": 270
+    }
+  }
+}

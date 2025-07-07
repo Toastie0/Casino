@@ -1,0 +1,38 @@
+{
+    "schemaVersion": 1,
+    "id": "casino",
+    "version": "${version}",
+    "name": "Casino",
+    "description": "Adds playing cards, poker chips, and casino gameplay to Minecraft!",
+    "authors": [
+        "Toastie"
+    ],
+    "contact": {
+        "homepage": "",
+        "sources": ""
+    },
+    "license": "GPL-3.0",
+    "icon": "assets/casino/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.ombremoon.playingcards.PlayingCardsMod"
+        ],
+        "client": [
+            "com.ombremoon.playingcards.client.PlayingCardsClientMod"
+        ]
+    },
+    "mixins": [
+        "casino.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.14",
+        "minecraft": "~1.20.1",
+        "java": ">=17",
+        "fabric-api": "*"
+    },
+    "suggests": {
+        "flamingo": "*",
+        "impactor": ">=5.2.0"
+    }
+}
