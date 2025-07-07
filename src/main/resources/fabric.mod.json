@@ -8,8 +8,8 @@
         "Toastie"
     ],
     "contact": {
-        "homepage": "",
-        "sources": ""
+        "homepage": "https://github.com/Manatico/Casino",
+        "sources": "https://github.com/Manatico/Casino"
     },
     "license": "GPL-3.0",
     "icon": "assets/casino/icon.png",
