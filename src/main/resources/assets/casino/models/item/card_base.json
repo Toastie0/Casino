@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "playingcards:item/cards/card_ace_spades",
-		"1": "playingcards:item/cards/card_cover_unknown",
-		"particle": "playingcards:item/cards/card_ace_spades"
+		"0": "casino:item/cards/card_ace_spades",
+		"1": "casino:item/cards/card_cover_unknown",
+		"particle": "casino:item/cards/card_ace_spades"
 	},
 	"elements": [
 		{

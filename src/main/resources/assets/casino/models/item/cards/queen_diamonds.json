@@ -1,6 +1,6 @@
-﻿{
+{
   "parent": "item/generated",
   "textures": {
-    "layer0": "playingcards:item/cards/card_queen_diamonds"
+    "layer0": "casino:item/cards/card_queen_diamonds"
   }
 }

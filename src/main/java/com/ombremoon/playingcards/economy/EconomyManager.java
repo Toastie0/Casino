@@ -5,12 +5,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import java.util.UUID;
 
 /**
- * Main economy manager that routes to server-side or client-side implementation
+ * Economy manager that routes to appropriate implementation based on environment
  */
 public class EconomyManager {
     
@@ -21,9 +20,7 @@ public class EconomyManager {
         PCReference.LOGGER.info("Economy Manager initialized");
     }
     
-    /**
-     * Server-side methods - only called on the server
-     */
+    // Server-side economy operations
     public static double getBalance(ServerPlayerEntity player) {
         return ServerEconomyManager.getBalance(player);
     }
@@ -48,9 +45,7 @@ public class EconomyManager {
         ServerEconomyManager.sendErrorMessage(player, message);
     }
     
-    /**
-     * Client-side methods - only called on the client
-     */
+    // Client-side economy operations
     @Environment(EnvType.CLIENT)
     public static double getClientBalance(UUID playerId) {
         return ClientEconomyManager.getBalance(playerId);
@@ -66,21 +61,15 @@ public class EconomyManager {
         ClientEconomyManager.updateBalance(playerId, balance);
     }
     
-    /**
-     * Common methods - available on both sides
-     */
+    // Common utility methods
     public static String formatCurrency(double amount) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            return ServerEconomyManager.formatCurrency(amount);
-        } else {
-            return ClientEconomyManager.formatCurrency(amount);
-        }
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER 
+            ? ServerEconomyManager.formatCurrency(amount)
+            : ClientEconomyManager.formatCurrency(amount);
     }
     
     public static boolean isImpactorAvailable() {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            return ServerEconomyManager.isImpactorAvailable();
-        }
-        return false; // Client doesn't check Impactor directly
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER 
+            && ServerEconomyManager.isImpactorAvailable();
     }
 }

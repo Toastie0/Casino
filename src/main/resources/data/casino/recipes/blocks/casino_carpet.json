@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " R ",
+    "GCG",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:red_dye"
+    },
+    "G": {
+      "item": "minecraft:green_dye"
+    },
+    "C": {
+      "tag": "minecraft:wool_carpets"
+    }
+  },
+  "result": {
+    "item": "casino:casino_carpet",
+    "count": 4
+  }
+}

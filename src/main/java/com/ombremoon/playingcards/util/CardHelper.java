@@ -17,49 +17,32 @@ public class CardHelper {
     /**
      * Get the display name for a card based on its ID (0-51)
      * Cards are organized as: Ace-King for each suit (Spades, Clubs, Diamonds, Hearts)
-     * @param id Card ID (0-51)
-     * @return Formatted card name (e.g., "Ace of Spades")
      */
     public static MutableText getCardName(int id) {
-        String type = "card.ace";
+        int value = getValue(id);
+        int suit = getSuit(id);
+        
+        String type = switch (value) {
+            case 1 -> "card.ace";
+            case 11 -> "card.jack";
+            case 12 -> "card.queen";
+            case 13 -> "card.king";
+            default -> String.valueOf(value);
+        };
 
-        int typeID = id / 4 + 1;  // 1-13 (Ace=1, Jack=11, Queen=12, King=13)
+        String suitName = switch (suit) {
+            case 0 -> "card.spades";
+            case 1 -> "card.clubs";
+            case 2 -> "card.diamonds";
+            case 3 -> "card.hearts";
+            default -> "card.spades";
+        };
 
-        if (typeID > 1 && typeID < 11) {
-            type = "" + typeID;  // Numbers 2-10
-        }
-
-        if (typeID > 10) {
-            type = "card.jack";
-
-            if (typeID > 11) {
-                type = "card.queen";
-
-                if (typeID > 12) {
-                    type = "card.king";
-                }
-            }
-        }
-
-        String suit = "card.spades";
-        int suitID = id % 4;
-
-        switch(suitID) {
-            case 1: {
-                suit = "card.clubs";
-                break;
-            }
-            case 2: {
-                suit = "card.diamonds";
-                break;
-            }
-            case 3: {
-                suit = "card.hearts";
-                break;
-            }
-        }
-
-        return Text.translatable(type).append(" ").append(Text.translatable("card.of").append(" ").append(Text.translatable(suit)));
+        return Text.translatable(type)
+            .append(" ")
+            .append(Text.translatable("card.of"))
+            .append(" ")
+            .append(Text.translatable(suitName));
     }
 
     /**

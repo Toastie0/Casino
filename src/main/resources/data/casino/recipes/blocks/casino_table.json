@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "W",
+    "L"
+  ],
+  "key": {
+    "L": {
+      "tag": "minecraft:logs"
+    },
+    "W": {
+      "item": "minecraft:green_carpet"
+    }
+  },
+  "result": {
+    "item": "casino:casino_table",
+    "count": 4
+  }
+}

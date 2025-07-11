@@ -2,8 +2,7 @@
 
 A comprehensive Minecraft mod adding playing cards, poker chips, and casino-style gameplay to Minecraft 1.20.1 using Fabric.
 
-**Author:** Toastie  
-**Hard fork** with permission from original authors
+**Author:** Toastie
 
 ## 🎯 **Current Status: Core Systems Complete and Production Ready**
 
@@ -20,19 +19,6 @@ This mod features **fully functional card, chip, economy, and multiplayer system
 - **Server Integration**: ✅ **WORKING** - Server-only Impactor installation confirmed
 - **Multiplayer**: ✅ **FIXED** - Card rendering issues resolved with CustomModelData system
 - **Client-Server Sync**: ✅ **WORKING** - All operations properly synchronized
-
-### 🎯 **Recently Fixed**
-- **Multiplayer Card Rendering**: Fixed face-up cards always showing Ace of Spades
-- **Card State Preservation**: Card backs now maintain their color when flipped
-- **CustomModelData System**: Modern rendering approach prevents multiplayer conflicts
-
-### ❌ **Missing Advanced Features**
-- **Blocks**: Poker tables, bar stools, casino carpets (3 blocks)
-- **Entities**: 3D cards, chips, dice on tables (5 entities + renderers)
-- **Game Mechanics**: Poker rules, turn-based gameplay, entity stacking
-- **Physics**: Dice throwing, chip stacking with realistic physics
-
-## 📦 **Installation**
 
 ### **Requirements**
 - Minecraft 1.20.1
@@ -194,48 +180,6 @@ cardId = (value - 1) * 4 + suit
 - **Reflection**: Impactor integration uses reflection (no compile dependency)
 - **Fallback**: Dummy economy when Impactor unavailable
 
-## ✅ **Project Status**
-
-### **Current Completion: ~85%**
-- **Core Systems**: 100% complete and tested
-- **Multiplayer**: 100% working with recent fixes
-- **Economy**: 100% working with Impactor integration
-- **Remaining**: Block system, entity system, and game mechanics
-
-### **Recent Achievements**
-- ✅ **Fixed Multiplayer Card Rendering**: All 52 cards display correctly
-- ✅ **Economy Integration**: Confirmed working in multiplayer servers
-- ✅ **GUI System**: Chip shop fully functional
-- ✅ **Command System**: All commands operational
-
----
-
-## 🎉 **Current Status Summary**
-
-This Fabric port has achieved **remarkable progress** with all core casino systems working perfectly:
-
-- **✅ Complete Item System**: 52 cards, 5 chip denominations, decks with 4 skin variants
-- **✅ Economy Integration**: Full Impactor server integration with fallback dummy economy  
-- **✅ Multiplayer Ready**: All card rendering issues resolved, perfect client-server sync
-- **✅ Production Quality**: Clean code architecture, comprehensive NBT handling, modern APIs
-
-The mod is now **ready for use as a complete item-based casino experience**. Players can buy chips, draw cards from decks, flip cards between face-up and covered states, and everything works flawlessly in multiplayer.
-
-**Next phase**: Implementing the block system (poker tables, stools) and entity system (3D cards/chips on tables) to complete the full casino experience.
-
-## 🐛 **Known Issues**
-
-### **No Critical Issues**
-All core functionality is working correctly. Minor areas for improvement:
-- **Performance**: Could be optimized for very high-load scenarios
-- **Edge Cases**: Some complex multiplayer scenarios need stress testing
-
-### **Missing Features (Planned Development)**
-- **Blocks**: Poker tables, stools, carpets (3 blocks needed)
-- **Entities**: 3D cards, chips, dice (5 entities + renderers needed)
-- **Game Mechanics**: Poker rules, physics system
-- **Advanced Features**: AI opponents, tournaments
-
 ## 📄 **License**
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
@@ -243,12 +187,12 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 ## 🙏 **Credits**
 
 ### **Original Mod**
-- **Authors**: Calemi and OmbreMoon
+- **Authors**: OmbreMoon
 - **Platform**: Minecraft Forge
 - **Source**: Original Playing Cards mod
 
 ### **Fabric Port**
-- **Developer**: Toastie (with Claude assistance)
+- **Developer**: Toastie
 - **Platform**: Fabric 1.20.1
 - **Achievements**: Complete item system, economy integration, multiplayer fixes
 - **Status**: Core systems production-ready, advanced features in development
@@ -268,16 +212,6 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 ---
 
 **Note**: This mod is currently in **active development**. The card system is complete and functional, but economy features and advanced functionality are still being implemented. Contributions and testing are welcome!
-
-## 🎨 **Assets Needed**
-
-### **Textures To Create/Improve**
-- **Casino Carpet**: Currently using original texture - needs modern casino-themed redesign
-- **High-Value Poker Chips**: Missing textures for:
-  - Purple Poker Chip ($500)
-  - Yellow Poker Chip ($1000) 
-  - Pink Poker Chip ($5000)
-  - Orange Poker Chip ($25000)
 
 ### **Current Chip System**
 - ✅ **9 Total Denominations**: $1, $5, $25, $50, $100, $500, $1000, $5000, $25000

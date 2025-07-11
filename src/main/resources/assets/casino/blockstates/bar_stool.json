@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=0": {
+      "model": "casino:block/bar_stool"
+    },
+    "facing=1": {
+      "model": "casino:block/bar_stool",
+      "y": 90
+    },
+    "facing=2": {
+      "model": "casino:block/bar_stool",
+      "y": 180
+    },
+    "facing=3": {
+      "model": "casino:block/bar_stool",
+      "y": 270
+    }
+  }
+}

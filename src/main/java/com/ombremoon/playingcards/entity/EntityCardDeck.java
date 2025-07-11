@@ -96,7 +96,15 @@ public class EntityCardDeck extends EntityStacked {
             player.getName().getString(), hand, getStackAmount());
         
         if (hand == Hand.MAIN_HAND) {
-            if (getStackAmount() > 0) {
+            ItemStack heldItem = player.getStackInHand(hand);
+            
+            // If player is holding a card, try to add it to the deck
+            if (heldItem.getItem() instanceof com.ombremoon.playingcards.item.ItemCardCovered) {
+                return handleCardAddition(player, heldItem);
+            }
+            
+            // If deck has cards and player is empty-handed, draw a card
+            if (heldItem.isEmpty() && getStackAmount() > 0) {
                 if (!this.getWorld().isClient) {
                     // Only allow one interaction per player at a time
                     synchronized (this) {
@@ -111,7 +119,7 @@ public class EntityCardDeck extends EntityStacked {
                 }
                 // Always return SUCCESS when we attempt to draw a card
                 return ActionResult.SUCCESS;
-            } else {
+            } else if (getStackAmount() <= 0) {
                 if (!this.getWorld().isClient) {
                     player.sendMessage(Text.translatable("message.deck.empty").formatted(Formatting.RED), true);
                 }
@@ -119,20 +127,62 @@ public class EntityCardDeck extends EntityStacked {
             }
         }
         
-        return ActionResult.FAIL;
+        return ActionResult.PASS;
+    }
+    
+    /**
+     * Handle adding a card to the deck (like the original)
+     */
+    private ActionResult handleCardAddition(PlayerEntity player, ItemStack cardStack) {
+        if (!this.getWorld().isClient) {
+            // Check if deck is full
+            if (getStackAmount() >= MAX_STACK_SIZE) {
+                player.sendMessage(Text.translatable("message.stack_full").formatted(Formatting.RED), true);
+                return ActionResult.FAIL;
+            }
+            
+            // Check if card belongs to this deck (UUID validation like original)
+            NbtCompound cardNbt = ItemHelper.getNBT(cardStack);
+            String cardDeckUUID = cardNbt.getString("UUID");
+            
+            if (!cardDeckUUID.isEmpty() && !cardDeckUUID.equals(this.getUuidAsString())) {
+                player.sendMessage(Text.translatable("message.stack_owner_error").formatted(Formatting.RED), true);
+                return ActionResult.FAIL;
+            }
+            
+            // Add card to deck
+            addToTop((byte) cardStack.getDamage());
+            cardStack.decrement(1);
+            
+            // Play sound
+            this.getWorld().playSound(null, this.getBlockPos(), SoundEvents.ITEM_BOOK_PUT, SoundCategory.PLAYERS, 0.5F, 1.2F);
+            
+            return ActionResult.SUCCESS;
+        }
+        
+        return ActionResult.CONSUME;
     }
 
     @Override
     public boolean damage(DamageSource source, float amount) {
         if (source.getAttacker() instanceof PlayerEntity player) {
             if (player.isSneaking()) {
+                // Crouch + attack: Pick up entire deck
                 if (!this.getWorld().isClient) {
                     takeEntireDeck(player);
                 }
             } else {
-                shuffleStack();
-                if (this.getWorld().isClient) {
-                    player.sendMessage(Text.translatable("message.deck.shuffled").formatted(Formatting.GREEN), true);
+                // Attack: Shuffle deck (like original)
+                if (!this.getWorld().isClient) {
+                    if (getStackAmount() > 0) {
+                        shuffleStack();
+                        player.sendMessage(Text.translatable("message.stack_shuffled").formatted(Formatting.GREEN), true);
+                        
+                        // Play shuffle sound
+                        this.getWorld().playSound(null, this.getBlockPos(), SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0F, 0.8F);
+                    } else {
+                        player.sendMessage(Text.translatable("message.stack_empty").formatted(Formatting.RED), true);
+                    }
                 }
             }
             return true;
@@ -175,6 +225,7 @@ public class EntityCardDeck extends EntityStacked {
         card.setDamage(getTopStackID());
         ItemHelper.getNBT(card).putString("UUID", this.getUuidAsString()); // Use string UUID like original
         ItemHelper.getNBT(card).putByte("SkinID", getSkinID());
+        ItemHelper.getNBT(card).putInt("CustomModelData", getSkinID()); // Add CustomModelData for texture variants
         ItemHelper.getNBT(card).putBoolean("Covered", true);
         
         // Spawn the card at the player using original method
@@ -206,6 +257,7 @@ public class EntityCardDeck extends EntityStacked {
         // Set NBT data
         NbtCompound nbt = ItemHelper.getNBT(deckStack);
         nbt.putByte("SkinID", getSkinID());
+        nbt.putInt("CustomModelData", getSkinID()); // Add CustomModelData for texture variants
         nbt.putInt("CardsLeft", stackAmount);
         
         if (hasOriginalDeckState()) {

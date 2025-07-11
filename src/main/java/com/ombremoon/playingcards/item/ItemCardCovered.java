@@ -95,6 +95,7 @@ public class ItemCardCovered extends Item {
         NbtCompound newNbt = ItemHelper.getNBT(newCard);
         newNbt.putInt("CardID", nbt.getInt("CardID"));
         newNbt.putByte("SkinID", nbt.getByte("SkinID"));
+        newNbt.putString("UUID", nbt.getString("UUID")); // Copy UUID as string
         newNbt.putBoolean("Covered", newCovered);
         
         // Copy damage value (card ID)
@@ -102,13 +103,13 @@ public class ItemCardCovered extends Item {
         
         // Handle CustomModelData properly based on card state
         if (newCovered) {
-            // Flipping TO covered - restore the skin ID from NBT as CustomModelData (0-3)
+            // Flipping TO covered - use the skin ID as CustomModelData (0-3)
             byte skinId = newNbt.getByte("SkinID");
-            newCard.getOrCreateNbt().putInt("CustomModelData", skinId);
+            newNbt.putInt("CustomModelData", skinId);
         } else {
             // Flipping TO face-up - use card ID + 100 as CustomModelData for face selection
-            int cardId = newNbt.getInt("CardID");
-            newCard.getOrCreateNbt().putInt("CustomModelData", 100 + cardId);
+            int cardId = newCard.getDamage(); // Use damage value as card ID
+            newNbt.putInt("CustomModelData", 100 + cardId);
         }
         
         // Debug logging
@@ -184,5 +185,114 @@ public class ItemCardCovered extends Item {
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return false; // Prevent enchantments
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, net.minecraft.world.World world, net.minecraft.entity.Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, world, entity, slot, selected);
+        
+        // Automatic cleanup like original - check every 60 ticks
+        if (world.getTime() % 60 == 0 && entity instanceof net.minecraft.entity.player.PlayerEntity player) {
+            NbtCompound nbt = ItemHelper.getNBT(stack);
+            
+            java.util.UUID deckUUID = ItemHelper.safeGetUuid(nbt, "UUID");
+            if (deckUUID == null || deckUUID.getLeastSignificantBits() == 0) {
+                return;
+            }
+            
+            // Look for parent deck in nearby area (like original - 20 block radius)
+            net.minecraft.util.math.BlockPos pos = player.getBlockPos();
+            java.util.List<com.ombremoon.playingcards.entity.EntityCardDeck> nearbyDecks = world.getEntitiesByClass(
+                com.ombremoon.playingcards.entity.EntityCardDeck.class,
+                new net.minecraft.util.math.Box(pos.getX() - 20, pos.getY() - 20, pos.getZ() - 20,
+                                               pos.getX() + 20, pos.getY() + 20, pos.getZ() + 20),
+                deck -> deck.getUuid().equals(deckUUID)
+            );
+            
+            // If no parent deck found, remove this card from inventory (like original)
+            if (nearbyDecks.isEmpty()) {
+                player.getInventory().getStack(slot).decrement(1);
+            }
+        }
+    }
+
+    @Override
+    public net.minecraft.util.ActionResult useOnBlock(net.minecraft.item.ItemUsageContext context) {
+        net.minecraft.entity.player.PlayerEntity player = context.getPlayer();
+        
+        if (player != null && !player.isSneaking()) {
+            net.minecraft.util.math.BlockPos pos = context.getBlockPos();
+            net.minecraft.world.World world = context.getWorld();
+            ItemStack stack = context.getStack();
+            
+            try {
+                // Look for nearby decks (like original - 8 block radius)
+                java.util.List<com.ombremoon.playingcards.entity.EntityCardDeck> nearbyDecks = world.getEntitiesByClass(
+                    com.ombremoon.playingcards.entity.EntityCardDeck.class,
+                    new net.minecraft.util.math.Box(pos.getX() - 8, pos.getY() - 8, pos.getZ() - 8,
+                                                   pos.getX() + 8, pos.getY() + 8, pos.getZ() + 8),
+                    deck -> true
+                );
+                
+                // Debug logging
+                com.ombremoon.playingcards.PCReference.LOGGER.info("Found {} nearby decks for card placement", nearbyDecks.size());
+                
+                NbtCompound nbt = ItemHelper.getNBT(stack);
+                java.util.UUID cardDeckUUID = null;
+                
+                // Safe UUID reading
+                if (nbt.contains("UUID")) {
+                    try {
+                        String uuidString = nbt.getString("UUID");
+                        if (!uuidString.isEmpty()) {
+                            cardDeckUUID = java.util.UUID.fromString(uuidString);
+                            com.ombremoon.playingcards.PCReference.LOGGER.info("Card UUID: {}", cardDeckUUID);
+                        }
+                    } catch (Exception ex) {
+                        // UUID is invalid, cardDeckUUID remains null
+                        com.ombremoon.playingcards.PCReference.LOGGER.warn("Invalid UUID in card: {}", ex.getMessage());
+                    }
+                } else {
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("Card has no UUID in NBT");
+                }
+                
+                // Find matching deck
+                for (com.ombremoon.playingcards.entity.EntityCardDeck deck : nearbyDecks) {
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("Checking deck UUID: {} vs card UUID: {}", deck.getUuid(), cardDeckUUID);
+                    if (cardDeckUUID != null && deck.getUuid().equals(cardDeckUUID)) {
+                        // Create card entity (like original)
+                        net.minecraft.util.math.Vec3d hitPos = context.getHitPos();
+                        
+                        // Safety checks before creating entity
+                        if (hitPos != null && !world.isClient) {
+                            com.ombremoon.playingcards.PCReference.LOGGER.info("Creating card entity at position: {}", hitPos);
+                            com.ombremoon.playingcards.entity.EntityCard cardEntity = new com.ombremoon.playingcards.entity.EntityCard(
+                                world, hitPos, context.getPlayerYaw(), nbt.getByte("SkinID"), 
+                                cardDeckUUID, nbt.getBoolean("Covered"), (byte) stack.getDamage()
+                            );
+                            
+                            world.spawnEntity(cardEntity);
+                            stack.decrement(1);
+                            com.ombremoon.playingcards.PCReference.LOGGER.info("Card entity spawned successfully");
+                        }
+                        
+                        return net.minecraft.util.ActionResult.SUCCESS;
+                    }
+                }
+                
+                // If no matching deck found, log it
+                if (cardDeckUUID != null) {
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("No matching deck found for card UUID: {}", cardDeckUUID);
+                } else {
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("Card has no UUID, cannot place");
+                }
+            } catch (Exception e) {
+                // Log the error and prevent crash
+                com.ombremoon.playingcards.PCReference.LOGGER.error("Error placing card entity: {}", e.getMessage(), e);
+                return net.minecraft.util.ActionResult.FAIL;
+            }
+        }
+        
+        return net.minecraft.util.ActionResult.PASS;
     }
 }

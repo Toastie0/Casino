@@ -35,6 +35,12 @@ public class EntityCard extends EntityStacked {
 
         createStack();
         addToTop(firstCardID);
+        
+        // Initialize the data tracker values after entity construction
+        initializeCardData(rotation, skinID, deckUUID, covered);
+    }
+    
+    private void initializeCardData(float rotation, byte skinID, UUID deckUUID, boolean covered) {
         this.dataTracker.set(ROTATION, rotation);
         this.dataTracker.set(SKIN_ID, skinID);
         this.dataTracker.set(DECK_UUID, Optional.of(deckUUID));
@@ -69,8 +75,67 @@ public class EntityCard extends EntityStacked {
     @Override
     public ActionResult interact(PlayerEntity player, Hand hand) {
         if (!this.getWorld().isClient) {
-            takeCard(player);
+            ItemStack heldItem = player.getStackInHand(hand);
+            
+            // If player is holding a card, try to add it to this stack
+            if (heldItem.getItem() instanceof com.ombremoon.playingcards.item.ItemCardCovered) {
+                return handleCardStacking(player, heldItem);
+            } else {
+                // Take a card from the stack
+                takeCard(player);
+            }
         }
+        return ActionResult.SUCCESS;
+    }
+    
+    /**
+     * Handle adding a card to this card stack (like original)
+     */
+    private ActionResult handleCardStacking(PlayerEntity player, ItemStack cardStack) {
+        // Check if stack is full
+        if (getStackAmount() >= MAX_STACK_SIZE) {
+            player.sendMessage(net.minecraft.text.Text.translatable("message.stack_full")
+                .formatted(net.minecraft.util.Formatting.RED), true);
+            return ActionResult.FAIL;
+        }
+        
+        // Check deck UUID validation (like original)
+        NbtCompound cardNbt = ItemHelper.getNBT(cardStack);
+        UUID cardDeckUUID = null;
+        
+        // Safe UUID reading
+        if (cardNbt.contains("UUID")) {
+            try {
+                cardDeckUUID = cardNbt.getUuid("UUID");
+            } catch (IllegalArgumentException e) {
+                try {
+                    String uuidString = cardNbt.getString("UUID");
+                    if (!uuidString.isEmpty()) {
+                        cardDeckUUID = java.util.UUID.fromString(uuidString);
+                    }
+                } catch (Exception ex) {
+                    // UUID is invalid, cardDeckUUID remains null
+                }
+            }
+        }
+        
+        UUID thisDeckUUID = getDeckUUID();
+        
+        if (thisDeckUUID != null && cardDeckUUID != null && !thisDeckUUID.equals(cardDeckUUID)) {
+            player.sendMessage(net.minecraft.text.Text.translatable("message.stack_owner_error")
+                .formatted(net.minecraft.util.Formatting.RED), true);
+            return ActionResult.FAIL;
+        }
+        
+        // Add card to stack
+        addToTop((byte) cardStack.getDamage());
+        cardStack.decrement(1);
+        
+        // Play sound
+        this.getWorld().playSound(null, this.getBlockPos(), 
+            net.minecraft.sound.SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, 
+            net.minecraft.sound.SoundCategory.PLAYERS, 0.3F, 1.2F);
+        
         return ActionResult.SUCCESS;
     }
 
@@ -131,9 +196,48 @@ public class EntityCard extends EntityStacked {
 
     @Override
     public void moreData() {
-        this.dataTracker.startTracking(ROTATION, 0.0F);
-        this.dataTracker.startTracking(SKIN_ID, (byte) 0);
-        this.dataTracker.startTracking(DECK_UUID, Optional.empty());
-        this.dataTracker.startTracking(COVERED, false);
+        // Data tracker registration is handled in initDataTracker() to prevent duplicates
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        
+        // Automatic cleanup like original - check every 20 ticks (1 second)
+        if (this.getWorld().getTime() % 20 == 0 && !this.getWorld().isClient) {
+            UUID deckUUID = getDeckUUID();
+            if (deckUUID != null) {
+                // Look for parent deck in nearby area (like original - 20 block radius)
+                net.minecraft.util.math.BlockPos pos = this.getBlockPos();
+                java.util.List<EntityCardDeck> nearbyDecks = this.getWorld().getEntitiesByClass(
+                    EntityCardDeck.class, 
+                    new net.minecraft.util.math.Box(pos.getX() - 20, pos.getY() - 20, pos.getZ() - 20, 
+                                                   pos.getX() + 20, pos.getY() + 20, pos.getZ() + 20),
+                    deck -> deck.getUuid().equals(deckUUID)
+                );
+                
+                // If no parent deck found, remove this card (like original)
+                if (nearbyDecks.isEmpty()) {
+                    this.discard();
+                }
+            }
+        }
+    }
+    
+    @Override
+    public boolean damage(net.minecraft.entity.damage.DamageSource source, float amount) {
+        // Flip card when attacked (like original)
+        if (source.getAttacker() instanceof PlayerEntity) {
+            boolean newCoveredState = !this.dataTracker.get(COVERED);
+            this.dataTracker.set(COVERED, newCoveredState);
+            
+            // Play sound for card flip
+            this.getWorld().playSound(null, this.getBlockPos(), 
+                net.minecraft.sound.SoundEvents.ITEM_BOOK_PAGE_TURN, 
+                net.minecraft.sound.SoundCategory.PLAYERS, 0.5F, 1.5F);
+            
+            return true;
+        }
+        return false;
     }
 }

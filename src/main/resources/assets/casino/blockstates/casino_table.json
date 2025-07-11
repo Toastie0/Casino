@@ -1,19 +1,210 @@
 {
-  "variants": {
-    "facing=0": {
-      "model": "playingcards:block/casino_table"
+  "multipart": [
+    {
+      "apply": {
+        "model": "casino:block/casino_table_base"
+      }
     },
-    "facing=1": {
-      "model": "playingcards:block/casino_table",
-      "y": 90
+
+    {
+      "when": {
+        "north": "false",
+        "east": "false",
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_closed",
+        "uvlock": false
+      }
     },
-    "facing=2": {
-      "model": "playingcards:block/casino_table",
-      "y": 180
+
+    {
+      "when": {
+        "north": "true",
+        "east": "false",
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_end",
+        "uvlock": false
+      }
     },
-    "facing=3": {
-      "model": "playingcards:block/casino_table",
-      "y": 270
+
+    {
+      "when": {
+        "north": "false",
+        "east": "true",
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_end",
+        "y": 90,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "false",
+        "east": "false",
+        "south": "true",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_end",
+        "y": 180,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "false",
+        "east": "false",
+        "south": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_end",
+        "y": 270,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "true",
+        "east": "true",
+        "south": "false",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_corner",
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "false",
+        "east": "true",
+        "south": "true",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_corner",
+        "y": 90,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "false",
+        "east": "false",
+        "south": "true",
+        "west": "true"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_corner",
+        "y": 180,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "true",
+        "east": "false",
+        "south": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_corner",
+        "y": 270,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "true",
+        "east": "true",
+        "south": "true",
+        "west": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_edge",
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "false",
+        "east": "true",
+        "south": "false",
+        "west": "true"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_edge",
+        "y": 90,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "true",
+        "west": "true",
+        "northwest": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_nook",
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "north": "true",
+        "east": "true",
+        "northeast": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_nook",
+        "y": 90,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "east": "true",
+        "south": "true",
+        "southeast": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_nook",
+        "y": 180,
+        "uvlock": false
+      }
+    },
+
+    {
+      "when": {
+        "west": "true",
+        "south": "true",
+        "southwest": "false"
+      },
+      "apply": {
+        "model": "casino:block/casino_table_nook",
+        "y": 270,
+        "uvlock": false
+      }
     }
-  }
+  ]
 }

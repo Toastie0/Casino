@@ -1,32 +1,32 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "playingcards:item/cards/card_cover_blue"
+    "layer0": "casino:item/cards/card_cover_blue"
   },
   "overrides": [
     {
       "predicate": {
         "custom_model_data": 0
       },
-      "model": "playingcards:item/card_covered_blue"
+      "model": "casino:item/card_covered_blue"
     },
     {
       "predicate": {
         "custom_model_data": 1
       },
-      "model": "playingcards:item/card_covered_red"
+      "model": "casino:item/card_covered_red"
     },
     {
       "predicate": {
         "custom_model_data": 2
       },
-      "model": "playingcards:item/card_covered_black"
+      "model": "casino:item/card_covered_black"
     },
     {
       "predicate": {
         "custom_model_data": 3
       },
-      "model": "playingcards:item/card_covered_pig"
+      "model": "casino:item/card_covered_pig"
     }
   ]
 }

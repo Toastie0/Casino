@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/carpet",
   "textures": {
-    "wool": "playingcards:block/casino_carpet"
+    "wool": "casino:block/casino_carpet"
   }
 }

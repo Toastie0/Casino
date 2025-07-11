@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "playingcards:item/poker_chip_pink"
+    "layer0": "casino:item/poker_chip_pink"
   }
 }

@@ -1,6 +1,6 @@
-﻿{
+{
   "parent": "item/generated",
   "textures": {
-    "layer0": "playingcards:item/cards/card_ace_hearts"
+    "layer0": "casino:item/cards/card_ace_hearts"
   }
 }

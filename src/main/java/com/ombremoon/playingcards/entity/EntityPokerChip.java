@@ -4,6 +4,7 @@ import com.ombremoon.playingcards.entity.base.EntityStacked;
 import com.ombremoon.playingcards.init.ModEntityTypes;
 import com.ombremoon.playingcards.init.ModItems;
 import com.ombremoon.playingcards.item.ItemPokerChip;
+import com.ombremoon.playingcards.util.ItemHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -59,15 +60,54 @@ public class EntityPokerChip extends EntityStacked {
 
     @Override
     public ActionResult interact(PlayerEntity player, Hand hand) {
-        if (!this.getWorld().isClient) {
-            if (player.isSneaking()) {
-                // Shift-click: Take entire stack
-                takeEntireStack(player);
-            } else {
-                // Right-click: Take one chip
-                takeOneChip(player);
+        ItemStack stack = player.getStackInHand(hand);
+        
+        if (stack.getItem() instanceof ItemPokerChip) {
+            // Player is holding a poker chip - try to add it to this stack
+            NbtCompound nbt = ItemHelper.getNBT(stack);
+            
+            if (nbt.contains("OwnerID")) {  // Note: Original uses "OwnerID" not "OwnerUUID"
+                UUID ownerUUID = nbt.getUuid("OwnerID");
+                
+                if (ownerUUID.equals(getOwnerUUID())) {
+                    if (player.isSneaking()) {
+                        // Crouch + right-click: Add all chips from hand
+                        while (getStackAmount() < MAX_STACK_SIZE && stack.getCount() > 0) {
+                            ItemPokerChip chip = (ItemPokerChip) stack.getItem();
+                            addToTop(chip.getChipId());
+                            stack.decrement(1);
+                        }
+                    } else {
+                        // Right-click: Add one chip
+                        if (getStackAmount() < MAX_STACK_SIZE) {
+                            ItemPokerChip chip = (ItemPokerChip) stack.getItem();
+                            addToTop(chip.getChipId());
+                            stack.decrement(1);
+                        } else {
+                            if (!this.getWorld().isClient) {
+                                player.sendMessage(Text.translatable("message.stack_full").formatted(Formatting.RED), true);
+                            }
+                        }
+                    }
+                } else {
+                    if (!this.getWorld().isClient) {
+                        player.sendMessage(Text.translatable("message.stack_owner_error").formatted(Formatting.RED), true);
+                    }
+                }
+            }
+        } else {
+            // Player is not holding a chip - try to take chips
+            if (!this.getWorld().isClient) {
+                if (player.isSneaking()) {
+                    // Shift-click: Take entire stack
+                    takeEntireStack(player);
+                } else {
+                    // Right-click: Take one chip
+                    takeOneChip(player);
+                }
             }
         }
+        
         return ActionResult.SUCCESS;
     }
 
@@ -140,7 +180,16 @@ public class EntityPokerChip extends EntityStacked {
 
     private ItemStack getChipItemStack(byte chipId, int count) {
         Item chipItem = getChipItemFromId(chipId);
-        return new ItemStack(chipItem, count);
+        ItemStack stack = new ItemStack(chipItem, count);
+        
+        // Set owner data in NBT
+        UUID ownerUUID = getOwnerUUID();
+        if (ownerUUID != null) {
+            stack.getOrCreateNbt().putUuid("OwnerID", ownerUUID);
+            stack.getOrCreateNbt().putString("OwnerName", getOwnerName());
+        }
+        
+        return stack;
     }
 
     private Item getChipItemFromId(byte chipId) {
@@ -224,7 +273,6 @@ public class EntityPokerChip extends EntityStacked {
 
     @Override
     public void moreData() {
-        this.dataTracker.startTracking(OWNER_UUID, Optional.empty());
-        this.dataTracker.startTracking(OWNER_NAME, "");
+        // Data tracker registration is handled in initDataTracker() to prevent duplicates
     }
 }

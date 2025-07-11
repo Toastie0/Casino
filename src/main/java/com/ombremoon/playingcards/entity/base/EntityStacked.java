@@ -133,16 +133,16 @@ public abstract class EntityStacked extends Entity {
 
     @Override
     public boolean isCollidable() {
-        return false;
+        return true; // Make entities collidable like the original
     }
 
     @Override
     public boolean canHit() {
-        return false;
+        return true; // Allow interaction
     }
 
     @Override
     public boolean isPushable() {
-        return true;
+        return false; // Prevent entities from pushing each other but keep physics
     }
 }

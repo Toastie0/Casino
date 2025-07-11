@@ -1,8 +1,10 @@
 package com.ombremoon.playingcards.economy;
 
 import com.ombremoon.playingcards.PCReference;
+import com.ombremoon.playingcards.config.CasinoConfig;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -16,17 +18,45 @@ import java.util.UUID;
  */
 public class ServerEconomyManager {
     private static final Map<UUID, Double> playerBalances = new HashMap<>();
-    private static final double STARTING_BALANCE = 10000.0; // $10,000 starting money for testing
     
     private static Boolean impactorAvailable = null; // null = not checked yet
     private static Object economyService = null;
     private static Object primaryCurrency = null;
     
     public static void initialize() {
-        PCReference.LOGGER.info("Server Economy Manager initialized - will check for Impactor dynamically");
+        // Impactor integration will be checked when first needed
     }
     
     private static boolean checkImpactorAvailability() {
+        if (impactorAvailable != null) {
+            return impactorAvailable; // Already checked
+        }
+        
+        // Check config first - if forcing dummy economy, don't even check for Impactor
+        CasinoConfig config = CasinoConfig.getInstance();
+        if (config.shouldForceDummyEconomy()) {
+            impactorAvailable = false;
+            PCReference.LOGGER.info("Economy mode forced to dummy - skipping Impactor detection");
+            return false;
+        }
+        
+        // If requiring Impactor, it must be available
+        if (config.shouldRequireImpactor()) {
+            boolean available = checkImpactorClasses();
+            if (!available) {
+                PCReference.LOGGER.error("Economy mode set to 'impactor' but Impactor is not available!");
+                throw new RuntimeException("Impactor economy required but not found");
+            }
+            impactorAvailable = true;
+            return true;
+        }
+        
+        // Auto-detect mode (default)
+        impactorAvailable = checkImpactorClasses();
+        return impactorAvailable;
+    }
+    
+    private static boolean checkImpactorClasses() {
         if (impactorAvailable != null) {
             return impactorAvailable; // Already checked
         }
@@ -68,29 +98,17 @@ public class ServerEconomyManager {
     public static double getBalance(ServerPlayerEntity player) {
         if (checkImpactorAvailability()) {
             try {
-                // Get account using reflection - interface method signature
-                Class<?> currencyInterface = Class.forName("net.impactdev.impactor.api.economy.currency.Currency");
-                Method accountMethod = economyService.getClass().getMethod("account", currencyInterface, UUID.class);
-                Object accountFuture = accountMethod.invoke(economyService, primaryCurrency, player.getUuid());
-                
-                // Wait for the CompletableFuture to complete
-                Method joinMethod = accountFuture.getClass().getMethod("join");
-                Object account = joinMethod.invoke(accountFuture);
-                
-                // Get balance
+                Object account = getImpactorAccount(player.getUuid());
                 Method balanceMethod = account.getClass().getMethod("balance");
                 BigDecimal balance = (BigDecimal) balanceMethod.invoke(account);
-                
                 return balance.doubleValue();
-                
             } catch (Exception e) {
                 PCReference.LOGGER.warn("Failed to get balance from Impactor: " + e.getMessage());
-                // Fall back to dummy economy
             }
         }
         
         // Dummy economy fallback for singleplayer/testing
-        return playerBalances.getOrDefault(player.getUuid(), STARTING_BALANCE);
+        return playerBalances.getOrDefault(player.getUuid(), CasinoConfig.getInstance().startingBalance);
     }
     
     public static boolean hasBalance(ServerPlayerEntity player, double amount) {
@@ -100,28 +118,14 @@ public class ServerEconomyManager {
     public static boolean withdraw(ServerPlayerEntity player, double amount) {
         if (checkImpactorAvailability()) {
             try {
-                // Get account using reflection - interface method signature
-                Class<?> currencyInterface = Class.forName("net.impactdev.impactor.api.economy.currency.Currency");
-                Method accountMethod = economyService.getClass().getMethod("account", currencyInterface, UUID.class);
-                Object accountFuture = accountMethod.invoke(economyService, primaryCurrency, player.getUuid());
-                
-                // Wait for the CompletableFuture to complete
-                Method joinMethod = accountFuture.getClass().getMethod("join");
-                Object account = joinMethod.invoke(accountFuture);
-                
-                // Withdraw money
+                Object account = getImpactorAccount(player.getUuid());
                 Method withdrawMethod = account.getClass().getMethod("withdraw", BigDecimal.class);
                 Object transaction = withdrawMethod.invoke(account, new BigDecimal(amount));
                 
-                // Check if transaction was successful
                 Method successfulMethod = transaction.getClass().getMethod("successful");
-                boolean success = (Boolean) successfulMethod.invoke(transaction);
-                
-                return success;
-                
+                return (Boolean) successfulMethod.invoke(transaction);
             } catch (Exception e) {
                 PCReference.LOGGER.warn("Failed to withdraw from Impactor: " + e.getMessage());
-                // Fall back to dummy economy
             }
         }
         
@@ -137,28 +141,14 @@ public class ServerEconomyManager {
     public static boolean deposit(ServerPlayerEntity player, double amount) {
         if (checkImpactorAvailability()) {
             try {
-                // Get account using reflection - interface method signature
-                Class<?> currencyInterface = Class.forName("net.impactdev.impactor.api.economy.currency.Currency");
-                Method accountMethod = economyService.getClass().getMethod("account", currencyInterface, UUID.class);
-                Object accountFuture = accountMethod.invoke(economyService, primaryCurrency, player.getUuid());
-                
-                // Wait for the CompletableFuture to complete
-                Method joinMethod = accountFuture.getClass().getMethod("join");
-                Object account = joinMethod.invoke(accountFuture);
-                
-                // Deposit money
+                Object account = getImpactorAccount(player.getUuid());
                 Method depositMethod = account.getClass().getMethod("deposit", BigDecimal.class);
                 Object transaction = depositMethod.invoke(account, new BigDecimal(amount));
                 
-                // Check if transaction was successful
                 Method successfulMethod = transaction.getClass().getMethod("successful");
-                boolean success = (Boolean) successfulMethod.invoke(transaction);
-                
-                return success;
-                
+                return (Boolean) successfulMethod.invoke(transaction);
             } catch (Exception e) {
                 PCReference.LOGGER.warn("Failed to deposit to Impactor: " + e.getMessage());
-                // Fall back to dummy economy
             }
         }
         
@@ -169,11 +159,15 @@ public class ServerEconomyManager {
     }
     
     public static void sendEconomyMessage(ServerPlayerEntity player, String message) {
-        player.sendMessage(Text.literal("§a[Economy] " + message), false);
+        Text text = Text.literal("[Economy] ").formatted(Formatting.GREEN)
+                       .append(Text.literal(message).formatted(Formatting.WHITE));
+        player.sendMessage(text, false);
     }
     
     public static void sendErrorMessage(ServerPlayerEntity player, String message) {
-        player.sendMessage(Text.literal("§c[Economy] " + message), false);
+        Text text = Text.literal("[Economy] ").formatted(Formatting.RED)
+                       .append(Text.literal(message).formatted(Formatting.WHITE));
+        player.sendMessage(text, false);
     }
     
     public static String formatCurrency(double amount) {
@@ -192,5 +186,38 @@ public class ServerEconomyManager {
     
     public static boolean isImpactorAvailable() {
         return checkImpactorAvailability();
+    }
+    
+    public static boolean isUsingImpactor() {
+        return isImpactorAvailable();
+    }
+    
+    public static void setBalance(ServerPlayerEntity player, double amount) {
+        if (isImpactorAvailable()) {
+            // Cannot set balance in Impactor - should not be called
+            PCReference.LOGGER.warn("Attempted to set balance while using Impactor economy");
+            return;
+        }
+        
+        // For dummy economy, set the balance directly
+        playerBalances.put(player.getUuid(), amount);
+    }
+    
+    public static void getBalance(ServerPlayerEntity player, java.util.function.Consumer<Double> callback) {
+        double balance = getBalance(player);
+        callback.accept(balance);
+    }
+    
+    /**
+     * Helper method to get Impactor account, reducing code duplication
+     */
+    private static Object getImpactorAccount(UUID playerId) throws Exception {
+        Class<?> currencyInterface = Class.forName("net.impactdev.impactor.api.economy.currency.Currency");
+        Method accountMethod = economyService.getClass().getMethod("account", currencyInterface, UUID.class);
+        Object accountFuture = accountMethod.invoke(economyService, primaryCurrency, playerId);
+        
+        // Wait for the CompletableFuture to complete
+        Method joinMethod = accountFuture.getClass().getMethod("join");
+        return joinMethod.invoke(accountFuture);
     }
 }

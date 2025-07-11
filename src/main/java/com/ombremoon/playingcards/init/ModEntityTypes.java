@@ -14,9 +14,12 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
+/**
+ * Registry for all Casino mod entity types including cards, chips, dice, and seats.
+ */
 public class ModEntityTypes {
     
-    // Entity Types
+    // ===== CASINO ENTITIES =====
     public static final EntityType<EntityCard> CARD = Registry.register(
         Registries.ENTITY_TYPE,
         new Identifier(PCReference.MOD_ID, "card"),
@@ -44,15 +47,6 @@ public class ModEntityTypes {
             .build()
     );
     
-    public static final EntityType<EntityDice> ENTITY_DICE = Registry.register(
-        Registries.ENTITY_TYPE,
-        new Identifier(PCReference.MOD_ID, "dice"),
-        FabricEntityTypeBuilder.<EntityDice>create(SpawnGroup.MISC, EntityDice::new)
-            .dimensions(EntityDimensions.fixed(0.25F, 0.25F))
-            .trackRangeBlocks(64)
-            .build()
-    );
-    
     public static final EntityType<EntitySeat> ENTITY_SEAT = Registry.register(
         Registries.ENTITY_TYPE,
         new Identifier(PCReference.MOD_ID, "seat"),
@@ -62,7 +56,19 @@ public class ModEntityTypes {
             .build()
     );
     
+    public static final EntityType<EntityDice> DICE = Registry.register(
+        Registries.ENTITY_TYPE,
+        new Identifier(PCReference.MOD_ID, "dice"),
+        FabricEntityTypeBuilder.<EntityDice>create(SpawnGroup.MISC, EntityDice::new)
+            .dimensions(EntityDimensions.fixed(0.4F, 0.4F))
+            .trackRangeBlocks(64)
+            .build()
+    );
+    
+    /**
+     * Initializes all mod entity types.
+     */
     public static void initialize() {
-        PCReference.LOGGER.info("Registering Playing Cards entity types...");
+        PCReference.LOGGER.info("Registering Casino entity types...");
     }
 }

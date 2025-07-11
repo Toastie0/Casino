@@ -24,15 +24,14 @@ public class EntityCardDeckRenderer extends EntityRenderer<EntityCardDeck> {
 
         ItemStack cardStack = new ItemStack(ModItems.CARD_COVERED);
         ItemHelper.getNBT(cardStack).putByte("SkinID", entity.getSkinID());
+        ItemHelper.getNBT(cardStack).putInt("CustomModelData", entity.getSkinID()); // Add CustomModelData for texture variants
 
         matrices.push();
-        // Remove the problematic rotation and use a simpler approach
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.getRotation()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-entity.getRotation() + 180));
         matrices.scale(1.5F, 1.5F, 1.5F);
 
-        // Render multiple cards to form a deck - ensure minimum visibility
-        int cardsToRender = Math.max(3, entity.getStackAmount());
-        for (int i = 0; i < cardsToRender; i++) {
+        // Render like the original: stack amount + 2 extra cards for better visual
+        for (int i = 0; i < entity.getStackAmount() + 2; i++) {
             CardHelper.renderItem(cardStack, entity.getWorld(), 0, i * 0.003D, 0, matrices, vertexConsumers, light);
         }
 

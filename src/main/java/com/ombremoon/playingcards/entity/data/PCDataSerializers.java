@@ -5,9 +5,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 
+/**
+ * Custom data serializers for entity tracking
+ */
 public class PCDataSerializers {
 
-    public static final TrackedDataHandler<Byte[]> STACK = new TrackedDataHandler<Byte[]>() {
+    public static final TrackedDataHandler<Byte[]> STACK = new TrackedDataHandler<>() {
         @Override
         public void write(PacketByteBuf buf, Byte[] value) {
             buf.writeByteArray(ArrayHelper.toPrimitive(value));
@@ -20,7 +23,7 @@ public class PCDataSerializers {
 
         @Override
         public Byte[] copy(Byte[] value) {
-            return ArrayHelper.clone(value);
+            return value == null ? null : value.clone();
         }
     };
 

@@ -1,5 +1,5 @@
 {
-  "parent": "playingcards:block/casino_table",
+  "parent": "casino:block/casino_table_inv",
   "display": {
     "thirdperson_righthand": {
       "rotation": [75, 45, 0],

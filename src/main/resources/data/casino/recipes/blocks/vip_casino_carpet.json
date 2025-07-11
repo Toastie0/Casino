@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " Y ",
+    "BCB",
+    " Y "
+  ],
+  "key": {
+    "Y": {
+      "item": "minecraft:yellow_dye"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    },
+    "C": {
+      "tag": "minecraft:wool_carpets"
+    }
+  },
+  "result": {
+    "item": "casino:vip_casino_carpet",
+    "count": 4
+  }
+}
