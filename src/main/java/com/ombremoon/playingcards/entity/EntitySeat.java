@@ -76,7 +76,7 @@ public class EntitySeat extends Entity {
 
     @Override
     public double getMountedHeightOffset() {
-        return 0.0D;
+        return 0.2D; // Raise the player slightly to prevent camera clipping
     }
 
     @Override

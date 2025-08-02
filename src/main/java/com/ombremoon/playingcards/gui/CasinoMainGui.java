@@ -3,11 +3,15 @@ package com.ombremoon.playingcards.gui;
 import com.ombremoon.playingcards.config.CasinoConfig;
 import com.ombremoon.playingcards.economy.EconomyManager;
 import com.ombremoon.playingcards.init.ModItems;
+import com.ombremoon.playingcards.item.ItemPokerChip;
 import com.ombremoon.playingcards.util.SellUtils;
+import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -60,7 +64,7 @@ public class CasinoMainGui extends SimpleGui {
         this.setSlot(22, new GuiElementBuilder(Items.HOPPER)
                 .setName(Text.literal("Sell All Casino Items").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setCallback((index, type, action, gui) -> {
-                    sellAllCasinoItems();
+                    // This callback is handled in onAnyClick method
                 })
                 .build());
         
@@ -80,6 +84,62 @@ public class CasinoMainGui extends SimpleGui {
         SellUtils.SellResult result = SellUtils.sellAllCasinoItems(this.getPlayer());
         
         if (result.success) {
+            // Refresh GUI to update balance
+            this.setupGui();
+        }
+    }
+    
+    @Override
+    public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+        // Handle selling when items are dragged/dropped into sell slot (22)
+        if (index == 22) {
+            ItemStack cursorStack = this.player.currentScreenHandler.getCursorStack();
+            
+            // If player has items in cursor (drag-and-drop), sell those items
+            if (!cursorStack.isEmpty() && (cursorStack.getItem() instanceof ItemPokerChip || 
+                cursorStack.getItem() == ModItems.CARD_DECK)) {
+                
+                // Handle different drop actions
+                if (action == SlotActionType.PICKUP || action == SlotActionType.QUICK_MOVE || 
+                    action == SlotActionType.THROW || action == SlotActionType.SWAP) {
+                    sellIndividualItem(cursorStack);
+                    return true;
+                }
+            }
+            // If player clicks hopper without items in cursor, sell all
+            else if (cursorStack.isEmpty() && type == ClickType.MOUSE_LEFT && action == SlotActionType.PICKUP) {
+                sellAllCasinoItems();
+                return true;
+            }
+        }
+        
+        // Handle shift-clicking chips from player inventory to auto-sell
+        if (type.shift && action == SlotActionType.QUICK_MOVE) {
+            // For shift-click, try to get the stack from the slot that was clicked
+            try {
+                ItemStack clickedStack = this.player.currentScreenHandler.getSlot(index).getStack();
+                if (!clickedStack.isEmpty() && (clickedStack.getItem() instanceof ItemPokerChip || 
+                    clickedStack.getItem() == ModItems.CARD_DECK)) {
+                    // Check if it's from player inventory (slots 27+ in a 3-row GUI)
+                    if (index >= 27) {
+                        sellIndividualItem(clickedStack);
+                        return true;
+                    }
+                }
+            } catch (Exception e) {
+                // If slot access fails, ignore
+            }
+        }
+        
+        return super.onAnyClick(index, type, action);
+    }
+    
+    /**
+     * Sells an individual item stack.
+     */
+    private void sellIndividualItem(ItemStack stack) {
+        double value = SellUtils.sellItemStack(this.getPlayer(), stack);
+        if (value > 0) {
             // Refresh GUI to update balance
             this.setupGui();
         }

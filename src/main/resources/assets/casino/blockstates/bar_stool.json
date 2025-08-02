@@ -1,18 +1,33 @@
 {
   "variants": {
-    "facing=0": {
+    "facing=0,on_carpet=false": {
       "model": "casino:block/bar_stool"
     },
-    "facing=1": {
+    "facing=1,on_carpet=false": {
       "model": "casino:block/bar_stool",
       "y": 90
     },
-    "facing=2": {
+    "facing=2,on_carpet=false": {
       "model": "casino:block/bar_stool",
       "y": 180
     },
-    "facing=3": {
+    "facing=3,on_carpet=false": {
       "model": "casino:block/bar_stool",
+      "y": 270
+    },
+    "facing=0,on_carpet=true": {
+      "model": "casino:block/bar_stool_on_carpet"
+    },
+    "facing=1,on_carpet=true": {
+      "model": "casino:block/bar_stool_on_carpet",
+      "y": 90
+    },
+    "facing=2,on_carpet=true": {
+      "model": "casino:block/bar_stool_on_carpet",
+      "y": 180
+    },
+    "facing=3,on_carpet=true": {
+      "model": "casino:block/bar_stool_on_carpet",
       "y": 270
     }
   }

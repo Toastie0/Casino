@@ -23,6 +23,7 @@ import java.util.List;
 /**
  * Simplified card deck item that can only be placed in the world.
  * Once placed, players interact with the deck entity to draw cards, shuffle, or collect.
+ * Right-click in air to flip between face-up and face-down modes.
  */
 public class ItemCardDeck extends Item {
 
@@ -44,39 +45,30 @@ public class ItemCardDeck extends Item {
             default -> "Card Deck";
         };
         
-        return Text.literal(deckName)
-                .formatted(getColorForSkin(skinId));
-    }
-    
-    private Formatting getColorForSkin(byte skinId) {
-        return switch (skinId) {
-            case 0 -> Formatting.BLUE;
-            case 1 -> Formatting.RED;
-            case 2 -> Formatting.DARK_GRAY;
-            case 3 -> Formatting.LIGHT_PURPLE;
-            default -> Formatting.WHITE;
-        };
-    }
-
-    @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        // Only show tooltip in inventory, not in GUI (when advanced tooltip is false)
-        if (!context.isAdvanced()) {
-            NbtCompound nbt = ItemHelper.getNBT(stack);
-            boolean faceUp = nbt.getBoolean("FaceUp");
-            
-            if (faceUp) {
-                tooltip.add(Text.literal("Face Up").formatted(Formatting.GREEN));
-            } else {
-                tooltip.add(Text.literal("Face Down").formatted(Formatting.GRAY));
-            }
-        }
+        return Text.literal(deckName).formatted(getColorForSkin(skinId));
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        // Deck can only be used by placing it in the world, not used in inventory
-        return TypedActionResult.pass(user.getStackInHand(hand));
+        ItemStack stack = user.getStackInHand(hand);
+        
+        if (!world.isClient) {
+            // Right-click in air to flip deck face mode
+            NbtCompound nbt = ItemHelper.getNBT(stack);
+            byte skinId = nbt.getByte("SkinID");
+            boolean currentFaceUp = nbt.getBoolean("FaceUp");
+            
+            // Create new deck with opposite face mode
+            ItemStack newDeck = ItemCardDeck.createDeck(skinId, !currentFaceUp);
+            
+            // Send feedback message to player
+            String faceMode = !currentFaceUp ? "Face Up" : "Face Down";
+            user.sendMessage(Text.literal("Deck flipped to " + faceMode).formatted(Formatting.GREEN), true);
+            
+            return TypedActionResult.success(newDeck);
+        }
+        
+        return TypedActionResult.pass(stack);
     }
 
     @Override
@@ -102,6 +94,34 @@ public class ItemCardDeck extends Item {
         }
         
         return ActionResult.PASS;
+    }
+    
+    private Formatting getColorForSkin(byte skinId) {
+        return switch (skinId) {
+            case 0 -> Formatting.BLUE;
+            case 1 -> Formatting.RED;
+            case 2 -> Formatting.DARK_GRAY;
+            case 3 -> Formatting.LIGHT_PURPLE;
+            default -> Formatting.WHITE;
+        };
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        NbtCompound nbt = ItemHelper.getNBT(stack);
+        
+        // Only show face mode if the NBT contains face data (real deck, not GUI display)
+        if (nbt.contains("FaceUp")) {
+            boolean faceUp = nbt.getBoolean("FaceUp");
+            if (faceUp) {
+                tooltip.add(Text.literal("Face Up").formatted(Formatting.GRAY));
+            } else {
+                tooltip.add(Text.literal("Face Down").formatted(Formatting.GRAY));
+            }
+        }
+        
+        // Deck value (show everywhere)
+        tooltip.add(Text.literal("Value: $50.00").formatted(Formatting.GREEN));
     }
     
     /**

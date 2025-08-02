@@ -149,7 +149,7 @@ public class ChipShopGui extends SimpleGui {
         this.setSlot(18, new GuiElementBuilder(Items.HOPPER)
                 .setName(Text.literal("Sell All Casino Items").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setCallback((index, type, action, gui) -> {
-                    sellAllCasinoItems();
+                    // This callback is handled in onAnyClick method
                 })
                 .build());
         
@@ -195,7 +195,6 @@ public class ChipShopGui extends SimpleGui {
         // Set the visual items in the slots using ModItems.CARD_DECK with CustomModelData
         this.setSlot(9, new GuiElementBuilder(ModItems.CARD_DECK)
                 .setName(Text.literal("Blue Card Deck").formatted(Formatting.BLUE))
-                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(0)
                 .setCallback((index, type, action, gui) -> {
@@ -205,7 +204,6 @@ public class ChipShopGui extends SimpleGui {
         
         this.setSlot(10, new GuiElementBuilder(ModItems.CARD_DECK)
                 .setName(Text.literal("Red Card Deck").formatted(Formatting.RED))
-                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(1)
                 .setCallback((index, type, action, gui) -> {
@@ -215,7 +213,6 @@ public class ChipShopGui extends SimpleGui {
         
         this.setSlot(11, new GuiElementBuilder(ModItems.CARD_DECK)
                 .setName(Text.literal("Black Card Deck").formatted(Formatting.DARK_GRAY))
-                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(2)
                 .setCallback((index, type, action, gui) -> {
@@ -225,7 +222,6 @@ public class ChipShopGui extends SimpleGui {
         
         this.setSlot(12, new GuiElementBuilder(ModItems.CARD_DECK)
                 .setName(Text.literal("Pig Card Deck").formatted(Formatting.LIGHT_PURPLE))
-                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(3)
                 .setCallback((index, type, action, gui) -> {
@@ -377,12 +373,24 @@ public class ChipShopGui extends SimpleGui {
     
     @Override
     public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
-        // Handle selling chips when dropped into sell slot
-        if (index == 18 && type == ClickType.MOUSE_LEFT && action == SlotActionType.PICKUP) {
+        // Handle selling when items are dragged/dropped into sell slot (18)
+        if (index == 18) {
             ItemStack cursorStack = this.player.currentScreenHandler.getCursorStack();
+            
+            // If player has items in cursor (drag-and-drop), sell those items
             if (!cursorStack.isEmpty() && (cursorStack.getItem() instanceof ItemPokerChip || 
                 cursorStack.getItem() == ModItems.CARD_DECK)) {
-                sellChips(cursorStack);
+                
+                // Handle different drop actions
+                if (action == SlotActionType.PICKUP || action == SlotActionType.QUICK_MOVE || 
+                    action == SlotActionType.THROW || action == SlotActionType.SWAP) {
+                    sellChips(cursorStack);
+                    return true;
+                }
+            }
+            // If player clicks hopper without items in cursor, sell all
+            else if (cursorStack.isEmpty() && type == ClickType.MOUSE_LEFT && action == SlotActionType.PICKUP) {
+                sellAllCasinoItems();
                 return true;
             }
         }

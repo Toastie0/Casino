@@ -1,0 +1,27 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_card_deck": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "casino:card_deck"
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "casino:blue_deck_flip_to_face_up",
+      "casino:blue_deck_flip_to_face_down",
+      "casino:red_deck_flip_to_face_up",
+      "casino:red_deck_flip_to_face_down",
+      "casino:black_deck_flip_to_face_up",
+      "casino:black_deck_flip_to_face_down",
+      "casino:pig_deck_flip_to_face_up",
+      "casino:pig_deck_flip_to_face_down"
+    ]
+  }
+}
