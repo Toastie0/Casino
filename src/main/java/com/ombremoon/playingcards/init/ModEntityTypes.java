@@ -3,7 +3,6 @@ package com.ombremoon.playingcards.init;
 import com.ombremoon.playingcards.PCReference;
 import com.ombremoon.playingcards.entity.EntityCard;
 import com.ombremoon.playingcards.entity.EntityCardDeck;
-import com.ombremoon.playingcards.entity.EntityDice;
 import com.ombremoon.playingcards.entity.EntityPokerChip;
 import com.ombremoon.playingcards.entity.EntitySeat;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -15,7 +14,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 /**
- * Registry for all Casino mod entity types including cards, chips, dice, and seats.
+ * Registry for all Casino mod entity types including cards, chips, and seats.
  */
 public class ModEntityTypes {
     
@@ -52,15 +51,6 @@ public class ModEntityTypes {
         new Identifier(PCReference.MOD_ID, "seat"),
         FabricEntityTypeBuilder.<EntitySeat>create(SpawnGroup.MISC, EntitySeat::new)
             .dimensions(EntityDimensions.fixed(0.0F, 0.0F))
-            .trackRangeBlocks(64)
-            .build()
-    );
-    
-    public static final EntityType<EntityDice> DICE = Registry.register(
-        Registries.ENTITY_TYPE,
-        new Identifier(PCReference.MOD_ID, "dice"),
-        FabricEntityTypeBuilder.<EntityDice>create(SpawnGroup.MISC, EntityDice::new)
-            .dimensions(EntityDimensions.fixed(0.4F, 0.4F))
             .trackRangeBlocks(64)
             .build()
     );

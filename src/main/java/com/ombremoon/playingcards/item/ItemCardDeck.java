@@ -35,17 +35,14 @@ public class ItemCardDeck extends Item {
         NbtCompound nbt = ItemHelper.getNBT(stack);
         byte skinId = nbt.getByte("SkinID");
         
-        // Create descriptive name based on card skin
-        String colorName = switch (skinId) {
-            case 0 -> "Blue";
-            case 1 -> "Red";
-            case 2 -> "Black";
-            case 3 -> "Pig";
-            default -> "Classic";
+        // Create descriptive name based on card skin (matching GUI names exactly)
+        String deckName = switch (skinId) {
+            case 0 -> "Blue Card Deck";
+            case 1 -> "Red Card Deck";
+            case 2 -> "Black Card Deck";
+            case 3 -> "Pig Card Deck";
+            default -> "Card Deck";
         };
-        
-        // Special case for Pig - don't add "Classic" prefix
-        String deckName = skinId == 3 ? "Pig Card Deck" : "Classic " + colorName + " Card Deck";
         
         return Text.literal(deckName)
                 .formatted(getColorForSkin(skinId));
@@ -63,8 +60,17 @@ public class ItemCardDeck extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        // Simple usage instruction only - name already shows the color
-        tooltip.add(Text.translatable("lore.deck.place").formatted(Formatting.YELLOW));
+        // Only show tooltip in inventory, not in GUI (when advanced tooltip is false)
+        if (!context.isAdvanced()) {
+            NbtCompound nbt = ItemHelper.getNBT(stack);
+            boolean faceUp = nbt.getBoolean("FaceUp");
+            
+            if (faceUp) {
+                tooltip.add(Text.literal("Face Up").formatted(Formatting.GREEN));
+            } else {
+                tooltip.add(Text.literal("Face Down").formatted(Formatting.GRAY));
+            }
+        }
     }
 
     @Override
@@ -82,7 +88,10 @@ public class ItemCardDeck extends Item {
         if (player != null && !world.isClient) {
             // Place deck entity in the world
             NbtCompound nbt = ItemHelper.getNBT(stack);
-            EntityCardDeck cardDeck = new EntityCardDeck(world, context.getHitPos(), context.getPlayerYaw(), nbt.getByte("SkinID"));
+            byte skinId = nbt.getByte("SkinID");
+            boolean faceUpMode = nbt.getBoolean("FaceUp");
+            
+            EntityCardDeck cardDeck = new EntityCardDeck(world, context.getHitPos(), context.getPlayerYaw(), skinId, true, faceUpMode);
             world.spawnEntity(cardDeck);
             
             if (!player.getAbilities().creativeMode) {
@@ -103,6 +112,19 @@ public class ItemCardDeck extends Item {
         NbtCompound nbt = ItemHelper.getNBT(stack);
         nbt.putByte("SkinID", skinId);
         nbt.putInt("CustomModelData", skinId);
+        nbt.putBoolean("FaceUp", false); // Default to face-down
+        return stack;
+    }
+    
+    /**
+     * Create a deck with a specific skin ID and face-up state
+     */
+    public static ItemStack createDeck(byte skinId, boolean faceUp) {
+        ItemStack stack = new ItemStack(ModItems.CARD_DECK);
+        NbtCompound nbt = ItemHelper.getNBT(stack);
+        nbt.putByte("SkinID", skinId);
+        nbt.putInt("CustomModelData", skinId);
+        nbt.putBoolean("FaceUp", faceUp);
         return stack;
     }
     

@@ -20,8 +20,8 @@ public abstract class EntityStacked extends Entity {
 
     public EntityStacked(EntityType<? extends EntityStacked> type, World world) {
         super(type, world);
-        // Make the bounding box slightly larger for better interaction
-        this.setBoundingBox(new Box(-0.3, 0.0, -0.3, 0.3, 0.2, 0.3));
+        // Make the bounding box smaller for chips to reduce collision issues
+        this.setBoundingBox(new Box(-0.125, 0.0, -0.125, 0.125, 0.05, 0.125));
     }
 
     public EntityStacked(EntityType<? extends EntityStacked> type, World world, Vec3d position) {
@@ -93,12 +93,13 @@ public abstract class EntityStacked extends Entity {
         if (this.getWorld().isClient) {
             this.noClip = false;
         } else {
-            this.noClip = !this.getWorld().isSpaceEmpty(this);
-            
-            if (this.noClip) {
-                this.setVelocity(this.getVelocity().add(0.0D, 0.02D, 0.0D));
+            // Simplified physics - less bouncy behavior
+            if (!this.isOnGround()) {
+                this.setVelocity(this.getVelocity().add(0.0D, -0.02D, 0.0D)); // Reduced gravity
             } else {
-                this.setVelocity(this.getVelocity().add(0.0D, -0.04D, 0.0D));
+                // Dampen movement when on ground to reduce bouncing
+                Vec3d velocity = this.getVelocity();
+                this.setVelocity(velocity.multiply(0.8D, 0.8D, 0.8D)); // Add friction
             }
         }
         
@@ -106,11 +107,11 @@ public abstract class EntityStacked extends Entity {
         
         // Set dynamic bounding box based on stack amount (like original)
         Vec3d pos = this.getPos();
-        double size = 0.2D;
-        double addAmount = 0.0045D;
+        double size = 0.125D; // Smaller hitbox for chips
+        double addAmount = 0.005D; // Smaller height increment per chip
         
         this.setBoundingBox(new Box(pos.x - size, pos.y, pos.z - size, 
-                                   pos.x + size, pos.y + 0.03D + (addAmount * getStackAmount()), pos.z + size));
+                                   pos.x + size, pos.y + 0.05D + (addAmount * getStackAmount()), pos.z + size));
     }
     
     public abstract void moreData();
@@ -133,7 +134,7 @@ public abstract class EntityStacked extends Entity {
 
     @Override
     public boolean isCollidable() {
-        return true; // Make entities collidable like the original
+        return false; // Disable collision to prevent bouncing between chips
     }
 
     @Override
@@ -143,6 +144,6 @@ public abstract class EntityStacked extends Entity {
 
     @Override
     public boolean isPushable() {
-        return false; // Prevent entities from pushing each other but keep physics
+        return false; // Prevent entities from pushing each other
     }
 }

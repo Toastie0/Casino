@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "casino:block/poker_table",
-		"particle": "casino:block/poker_table"
+		"0": "casino:block/casino_table",
+		"particle": "casino:block/casino_table"
 	},
 	"elements": [
 		{

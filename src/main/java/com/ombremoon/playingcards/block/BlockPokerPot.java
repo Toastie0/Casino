@@ -11,12 +11,12 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Regular casino table that can connect seamlessly with other casino table variants.
+ * Poker pot table that can connect seamlessly with other casino table variants.
  * Uses the simplified BaseConnectableTable architecture.
  */
-public class BlockCasinoTable extends BaseConnectableTable {
+public class BlockPokerPot extends BaseConnectableTable {
     
-    public BlockCasinoTable() {
+    public BlockPokerPot() {
         super(FabricBlockSettings.create()
             .hardness(2.0f)
             .resistance(3.0f)

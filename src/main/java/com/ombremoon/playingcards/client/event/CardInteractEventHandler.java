@@ -32,7 +32,8 @@ public class CardInteractEventHandler {
             if (player != null) {
                 ItemStack heldStack = player.getMainHandStack();
                 
-                if (heldStack.getItem() instanceof ItemCardCovered) {
+                // Only flip cards when holding a card AND not sneaking
+                if (heldStack.getItem() instanceof ItemCardCovered && !player.isSneaking()) {
                     // Send flip command to server
                     ModNetworking.sendCardInteractToServer("flipinv");
                 }

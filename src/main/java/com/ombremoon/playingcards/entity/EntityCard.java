@@ -122,7 +122,7 @@ public class EntityCard extends EntityStacked {
         UUID thisDeckUUID = getDeckUUID();
         
         if (thisDeckUUID != null && cardDeckUUID != null && !thisDeckUUID.equals(cardDeckUUID)) {
-            player.sendMessage(net.minecraft.text.Text.translatable("message.stack_owner_error")
+            player.sendMessage(net.minecraft.text.Text.translatable("message.deck.wrong_deck")
                 .formatted(net.minecraft.util.Formatting.RED), true);
             return ActionResult.FAIL;
         }
@@ -158,6 +158,15 @@ public class EntityCard extends EntityStacked {
         }
         nbt.putByte("SkinID", this.dataTracker.get(SKIN_ID));
         nbt.putBoolean("Covered", this.dataTracker.get(COVERED));
+        
+        // Set proper CustomModelData based on card state
+        if (this.dataTracker.get(COVERED)) {
+            // Covered card - use skin ID for card back texture
+            nbt.putInt("CustomModelData", this.dataTracker.get(SKIN_ID));
+        } else {
+            // Face-up card - use card ID + 100 for specific card face texture
+            nbt.putInt("CustomModelData", 100 + getTopStackID());
+        }
 
         // Give item to player
         if (!player.giveItemStack(card)) {

@@ -11,15 +11,15 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Regular casino table that can connect seamlessly with other casino table variants.
+ * VIP casino table that can connect seamlessly with other casino table variants.
  * Uses the simplified BaseConnectableTable architecture.
  */
-public class BlockCasinoTable extends BaseConnectableTable {
+public class BlockVipCasinoTable extends BaseConnectableTable {
     
-    public BlockCasinoTable() {
+    public BlockVipCasinoTable() {
         super(FabricBlockSettings.create()
-            .hardness(2.0f)
-            .resistance(3.0f)
+            .hardness(2.5f)
+            .resistance(4.0f)
             .sounds(BlockSoundGroup.WOOD)
             .nonOpaque());
     }

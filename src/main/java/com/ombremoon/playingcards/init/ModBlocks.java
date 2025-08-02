@@ -4,7 +4,9 @@ import com.ombremoon.playingcards.PCReference;
 import com.ombremoon.playingcards.block.BlockBarStool;
 import com.ombremoon.playingcards.block.BlockCasinoCarpet;
 import com.ombremoon.playingcards.block.BlockCasinoTable;
+import com.ombremoon.playingcards.block.BlockPokerPot;
 import com.ombremoon.playingcards.block.BlockVipCasinoCarpet;
+import com.ombremoon.playingcards.block.BlockVipCasinoTable;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -24,6 +26,10 @@ public class ModBlocks {
         new BlockVipCasinoCarpet());
     public static final Block CASINO_TABLE = registerBlock("casino_table", 
         new BlockCasinoTable());
+    public static final Block VIP_CASINO_TABLE = registerBlock("vip_casino_table", 
+        new BlockVipCasinoTable());
+    public static final Block POKER_POT = registerBlock("poker_pot", 
+        new BlockPokerPot());
     public static final Block BAR_STOOL = registerBlock("bar_stool", 
         new BlockBarStool());
     

@@ -4,7 +4,6 @@ import com.ombremoon.playingcards.config.CasinoConfig;
 import com.ombremoon.playingcards.economy.EconomyManager;
 import com.ombremoon.playingcards.init.ModItems;
 import com.ombremoon.playingcards.item.ItemPokerChip;
-import com.ombremoon.playingcards.item.ItemFantasyDice;
 import com.ombremoon.playingcards.util.SellUtils;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -49,10 +48,6 @@ public class ChipShopGui extends SimpleGui {
         double whitePrice = getChipPrice("white");
         this.setSlot(0, new GuiElementBuilder(ModItems.WHITE_POKER_CHIP)
                 .setName(Text.literal("White Poker Chip").formatted(Formatting.WHITE))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", whitePrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(whitePrice) : 1;
                     buyChip(ModItems.WHITE_POKER_CHIP, whitePrice, amount, "white");
@@ -63,10 +58,6 @@ public class ChipShopGui extends SimpleGui {
         double redPrice = getChipPrice("red");
         this.setSlot(1, new GuiElementBuilder(ModItems.RED_POKER_CHIP)
                 .setName(Text.literal("Red Poker Chip").formatted(Formatting.RED))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", redPrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(redPrice) : 1;
                     buyChip(ModItems.RED_POKER_CHIP, redPrice, amount, "red");
@@ -77,10 +68,6 @@ public class ChipShopGui extends SimpleGui {
         double greenPrice = getChipPrice("green");
         this.setSlot(2, new GuiElementBuilder(ModItems.GREEN_POKER_CHIP)
                 .setName(Text.literal("Green Poker Chip").formatted(Formatting.GREEN))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", greenPrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(greenPrice) : 1;
                     buyChip(ModItems.GREEN_POKER_CHIP, greenPrice, amount, "green");
@@ -91,10 +78,6 @@ public class ChipShopGui extends SimpleGui {
         double bluePrice = getChipPrice("blue");
         this.setSlot(3, new GuiElementBuilder(ModItems.BLUE_POKER_CHIP)
                 .setName(Text.literal("Blue Poker Chip").formatted(Formatting.BLUE))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", bluePrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(bluePrice) : 1;
                     buyChip(ModItems.BLUE_POKER_CHIP, bluePrice, amount, "blue");
@@ -105,10 +88,6 @@ public class ChipShopGui extends SimpleGui {
         double blackPrice = getChipPrice("black");
         this.setSlot(4, new GuiElementBuilder(ModItems.BLACK_POKER_CHIP)
                 .setName(Text.literal("Black Poker Chip").formatted(Formatting.DARK_GRAY))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", blackPrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(blackPrice) : 1;
                     buyChip(ModItems.BLACK_POKER_CHIP, blackPrice, amount, "black");
@@ -119,10 +98,6 @@ public class ChipShopGui extends SimpleGui {
         double purplePrice = getChipPrice("purple");
         this.setSlot(5, new GuiElementBuilder(ModItems.PURPLE_POKER_CHIP)
                 .setName(Text.literal("Purple Poker Chip").formatted(Formatting.DARK_PURPLE))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", purplePrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(purplePrice) : 1;
                     buyChip(ModItems.PURPLE_POKER_CHIP, purplePrice, amount, "purple");
@@ -133,10 +108,6 @@ public class ChipShopGui extends SimpleGui {
         double yellowPrice = getChipPrice("yellow");
         this.setSlot(6, new GuiElementBuilder(ModItems.YELLOW_POKER_CHIP)
                 .setName(Text.literal("Yellow Poker Chip").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", yellowPrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(yellowPrice) : 1;
                     buyChip(ModItems.YELLOW_POKER_CHIP, yellowPrice, amount, "yellow");
@@ -147,10 +118,6 @@ public class ChipShopGui extends SimpleGui {
         double pinkPrice = getChipPrice("pink");
         this.setSlot(7, new GuiElementBuilder(ModItems.PINK_POKER_CHIP)
                 .setName(Text.literal("Pink Poker Chip").formatted(Formatting.LIGHT_PURPLE))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", pinkPrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(pinkPrice) : 1;
                     buyChip(ModItems.PINK_POKER_CHIP, pinkPrice, amount, "pink");
@@ -161,10 +128,6 @@ public class ChipShopGui extends SimpleGui {
         double orangePrice = getChipPrice("orange");
         this.setSlot(8, new GuiElementBuilder(ModItems.ORANGE_POKER_CHIP)
                 .setName(Text.literal("Orange Poker Chip").formatted(Formatting.GOLD))
-                .addLoreLine(Text.literal("$" + String.format("%.2f", orangePrice) + " each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     int amount = type.shift ? getMaxAffordable(orangePrice) : 1;
                     buyChip(ModItems.ORANGE_POKER_CHIP, orangePrice, amount, "orange");
@@ -174,34 +137,17 @@ public class ChipShopGui extends SimpleGui {
         // Row 2: Card Decks (9-12) + Glass Panes (13-17)
         // Note: Card deck visuals will be set up by updateCardDeckVisuals() method
         
-        // Slots 13-16: Glass Panes (moved from 13-17 to make room for dice)
-        for (int i = 13; i <= 16; i++) {
+        // Slots 13-17: Glass Panes
+        for (int i = 13; i <= 17; i++) {
             this.setSlot(i, new GuiElementBuilder(Items.GRAY_STAINED_GLASS_PANE)
                     .setName(Text.literal(""))
                     .build());
         }
         
-        // Slot 17: Traditional Dice
-        this.setSlot(17, new GuiElementBuilder(ModItems.SIMPLE_DICE)
-                .setName(Text.literal("Traditional Dice").formatted(Formatting.GOLD, Formatting.BOLD))
-                .addLoreLine(Text.literal("Price: $10").formatted(Formatting.GREEN))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Left Click: Buy 1").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Shift Click: Buy max affordable").formatted(Formatting.YELLOW))
-                .setCallback((index, type, action, gui) -> {
-                    int amount = type.shift ? getMaxAffordableSimpleDice(10.0) : 1;
-                    buySimpleDice(amount, 10.0);
-                })
-                .build());
-        
         // Row 3: Sell Slot + Glass Panes + Balance + Close
         // Slot 18: Sell Slot
         this.setSlot(18, new GuiElementBuilder(Items.HOPPER)
                 .setName(Text.literal("Sell All Casino Items").formatted(Formatting.GREEN, Formatting.BOLD))
-                .addLoreLine(Text.literal("Sell all poker chips, decks,").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal("and dice in your inventory").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Click to sell all").formatted(Formatting.YELLOW))
                 .setCallback((index, type, action, gui) -> {
                     sellAllCasinoItems();
                 })
@@ -214,20 +160,27 @@ public class ChipShopGui extends SimpleGui {
                     .build());
         }
         
-        // Slot 25: Balance Display
-        this.setSlot(25, new GuiElementBuilder(Items.GOLD_INGOT)
+        // Slot 19: Balance Display (moved next to hopper)
+        this.setSlot(19, new GuiElementBuilder(Items.GOLD_INGOT)
                 .setName(Text.literal("Your Balance").formatted(Formatting.GOLD))
                 .addLoreLine(Text.literal("$" + String.format("%.2f", EconomyManager.getBalance(this.player))).formatted(Formatting.GREEN))
                 .build());
         
-        // Slot 26: Back Button
-        this.setSlot(26, new GuiElementBuilder(Items.ARROW)
+        // Slot 25: Back Button (moved one to the left)
+        this.setSlot(25, new GuiElementBuilder(Items.ARROW)
                 .setName(Text.literal("Back").formatted(Formatting.YELLOW))
-                .addLoreLine(Text.literal("Return to Casino Management").formatted(Formatting.GRAY))
                 .setCallback((index, type, action, gui) -> {
                     gui.close();
                     CasinoMainGui casinoGui = new CasinoMainGui(this.getPlayer());
                     casinoGui.open();
+                })
+                .build());
+        
+        // Slot 26: Close Button (moved one down)
+        this.setSlot(26, new GuiElementBuilder(Items.BARRIER)
+                .setName(Text.literal("Close").formatted(Formatting.RED, Formatting.BOLD))
+                .setCallback((index, type, action, gui) -> {
+                    gui.close();
                 })
                 .build());
         
@@ -241,50 +194,38 @@ public class ChipShopGui extends SimpleGui {
     private void updateCardDeckVisuals() {
         // Set the visual items in the slots using ModItems.CARD_DECK with CustomModelData
         this.setSlot(9, new GuiElementBuilder(ModItems.CARD_DECK)
-                .setName(Text.literal("Classic Blue Card Deck").formatted(Formatting.BLUE))
-                .addLoreLine(Text.literal("$50.00 each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal("Contains 52 cards").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Click to buy 1 deck").formatted(Formatting.YELLOW))
+                .setName(Text.literal("Blue Card Deck").formatted(Formatting.BLUE))
+                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(0)
                 .setCallback((index, type, action, gui) -> {
-                    buyCardDeck(1, (byte) 0, "Classic Blue");
+                    buyCardDeck(1, (byte) 0, "Blue");
                 })
                 .build());
         
         this.setSlot(10, new GuiElementBuilder(ModItems.CARD_DECK)
-                .setName(Text.literal("Classic Red Card Deck").formatted(Formatting.RED))
-                .addLoreLine(Text.literal("$50.00 each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal("Contains 52 cards").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Click to buy 1 deck").formatted(Formatting.YELLOW))
+                .setName(Text.literal("Red Card Deck").formatted(Formatting.RED))
+                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(1)
                 .setCallback((index, type, action, gui) -> {
-                    buyCardDeck(1, (byte) 1, "Classic Red");
+                    buyCardDeck(1, (byte) 1, "Red");
                 })
                 .build());
         
         this.setSlot(11, new GuiElementBuilder(ModItems.CARD_DECK)
-                .setName(Text.literal("Classic Black Card Deck").formatted(Formatting.DARK_GRAY))
-                .addLoreLine(Text.literal("$50.00 each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal("Contains 52 cards").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Click to buy 1 deck").formatted(Formatting.YELLOW))
+                .setName(Text.literal("Black Card Deck").formatted(Formatting.DARK_GRAY))
+                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(2)
                 .setCallback((index, type, action, gui) -> {
-                    buyCardDeck(1, (byte) 2, "Classic Black");
+                    buyCardDeck(1, (byte) 2, "Black");
                 })
                 .build());
         
         this.setSlot(12, new GuiElementBuilder(ModItems.CARD_DECK)
                 .setName(Text.literal("Pig Card Deck").formatted(Formatting.LIGHT_PURPLE))
-                .addLoreLine(Text.literal("$50.00 each").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal("Contains 52 cards").formatted(Formatting.GRAY))
-                .addLoreLine(Text.literal(""))
-                .addLoreLine(Text.literal("Click to buy 1 deck").formatted(Formatting.YELLOW))
+                .addLoreLine(Text.literal("Value: $50").formatted(Formatting.GREEN))
                 .glow()
                 .setCustomModelData(3)
                 .setCallback((index, type, action, gui) -> {
@@ -366,11 +307,9 @@ public class ChipShopGui extends SimpleGui {
     }
     
     private void sellChips(ItemStack itemStack) {
-        // Check if it's a sellable item (poker chip, card deck, simple dice, or fantasy dice)
+        // Check if it's a sellable item (poker chip or card deck)
         if (!(itemStack.getItem() instanceof ItemPokerChip) && 
-            itemStack.getItem() != ModItems.CARD_DECK && 
-            itemStack.getItem() != ModItems.SIMPLE_DICE &&
-            itemStack.getItem() != ModItems.FANTASY_DICE) {
+            itemStack.getItem() != ModItems.CARD_DECK) {
             return;
         }
         
@@ -415,16 +354,6 @@ public class ChipShopGui extends SimpleGui {
         
         // Other items sell for same price as bought
         if (item == ModItems.CARD_DECK) return 50.0;
-        if (item == ModItems.SIMPLE_DICE) return 10.0; // Traditional dice
-        
-        // Fantasy dice - calculate price based on material and sides
-        if (item == ModItems.FANTASY_DICE) {
-            int sides = ItemFantasyDice.getSides(itemStack);
-            String material = ItemFantasyDice.getMaterial(itemStack);
-            if (sides > 0 && !material.isEmpty()) {
-                return ItemFantasyDice.calculatePrice(sides, material);
-            }
-        }
         
         return 0.0;
     }
@@ -442,17 +371,6 @@ public class ChipShopGui extends SimpleGui {
         if (item == ModItems.PINK_POKER_CHIP) return "pink poker chip" + (itemStack.getCount() > 1 ? "s" : "");
         if (item == ModItems.ORANGE_POKER_CHIP) return "orange poker chip" + (itemStack.getCount() > 1 ? "s" : "");
         if (item == ModItems.CARD_DECK) return "card deck" + (itemStack.getCount() > 1 ? "s" : "");
-        if (item == ModItems.SIMPLE_DICE) return "traditional dice";
-        
-        if (item == ModItems.FANTASY_DICE) {
-            int sides = ItemFantasyDice.getSides(itemStack);
-            String material = ItemFantasyDice.getMaterial(itemStack);
-            if (sides > 0 && !material.isEmpty()) {
-                String materialName = material.substring(0, 1).toUpperCase() + material.substring(1);
-                return materialName.toLowerCase() + " " + sides + "-sided dice";
-            }
-            return "fantasy dice";
-        }
         
         return "item" + (itemStack.getCount() > 1 ? "s" : "");
     }
@@ -463,9 +381,7 @@ public class ChipShopGui extends SimpleGui {
         if (index == 18 && type == ClickType.MOUSE_LEFT && action == SlotActionType.PICKUP) {
             ItemStack cursorStack = this.player.currentScreenHandler.getCursorStack();
             if (!cursorStack.isEmpty() && (cursorStack.getItem() instanceof ItemPokerChip || 
-                cursorStack.getItem() == ModItems.CARD_DECK || 
-                cursorStack.getItem() == ModItems.SIMPLE_DICE || 
-                cursorStack.getItem() == ModItems.FANTASY_DICE)) {
+                cursorStack.getItem() == ModItems.CARD_DECK)) {
                 sellChips(cursorStack);
                 return true;
             }
@@ -477,9 +393,7 @@ public class ChipShopGui extends SimpleGui {
             try {
                 ItemStack clickedStack = this.player.currentScreenHandler.getSlot(index).getStack();
                 if (!clickedStack.isEmpty() && (clickedStack.getItem() instanceof ItemPokerChip || 
-                    clickedStack.getItem() == ModItems.CARD_DECK || 
-                    clickedStack.getItem() == ModItems.SIMPLE_DICE || 
-                    clickedStack.getItem() == ModItems.FANTASY_DICE)) {
+                    clickedStack.getItem() == ModItems.CARD_DECK)) {
                     // Check if it's from player inventory (slots 27+ in a 3-row GUI)
                     if (index >= 27) {
                         sellChips(clickedStack);
@@ -496,52 +410,10 @@ public class ChipShopGui extends SimpleGui {
     
     private void updateBalance() {
         double balance = EconomyManager.getBalance(this.player);
-        this.setSlot(25, new GuiElementBuilder(Items.GOLD_INGOT)
+        this.setSlot(19, new GuiElementBuilder(Items.GOLD_INGOT)
                 .setName(Text.literal("Your Balance").formatted(Formatting.GOLD))
                 .addLoreLine(Text.literal("$" + String.format("%.2f", balance)).formatted(Formatting.GREEN))
                 .build());
-    }
-    
-    /**
-     * Buys simple dice for the player.
-     */
-    private void buySimpleDice(int amount, double pricePerDice) {
-        double totalCost = amount * pricePerDice;
-        
-        if (EconomyManager.hasBalance(this.player, totalCost)) {
-            if (EconomyManager.withdraw(this.player, totalCost)) {
-                // Give the dice to the player
-                for (int i = 0; i < amount; i++) {
-                    ItemStack diceStack = new ItemStack(ModItems.SIMPLE_DICE);
-                    if (!this.player.getInventory().insertStack(diceStack)) {
-                        this.player.dropItem(diceStack, false);
-                    }
-                }
-                
-                // Play success sound
-                this.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
-                
-                // Send success message
-                EconomyManager.sendEconomyMessage(this.player, 
-                    String.format("Purchased %d traditional dice for $%.0f", amount, totalCost));
-                
-                // Update the balance display
-                this.updateBalance();
-            }
-        } else {
-            // Play error sound
-            this.player.playSound(SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.0f, 2.0f);
-            EconomyManager.sendErrorMessage(this.player, "Insufficient funds!");
-        }
-    }
-    
-    /**
-     * Gets the maximum affordable amount of simple dice.
-     */
-    private int getMaxAffordableSimpleDice(double pricePerDice) {
-        double balance = EconomyManager.getBalance(this.player);
-        int maxAmount = (int) (balance / pricePerDice);
-        return Math.min(maxAmount, 8); // Max stack size for simple dice
     }
     
     /**

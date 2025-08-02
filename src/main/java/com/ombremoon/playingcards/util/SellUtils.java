@@ -9,14 +9,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 /**
- * Utility class for selling casino items (chips, decks, dice) in the casino mod.
+ * Utility class for selling casino items (chips and decks) in the casino mod.
  * Provides unified selling logic for both GUI and shift-click interactions.
  */
 public class SellUtils {
     
     // Default sell prices for non-chip items
     private static final double CARD_DECK_SELL_PRICE = 50.0;
-    private static final double DICE_SELL_PRICE = 10.0;
     
     /**
      * Result of a selling operation.
@@ -25,15 +24,13 @@ public class SellUtils {
         public final double totalValue;
         public final int chipsSold;
         public final int decksSold;
-        public final int diceSold;
         public final boolean success;
         
-        public SellResult(double totalValue, int chipsSold, int decksSold, int diceSold) {
+        public SellResult(double totalValue, int chipsSold, int decksSold) {
             this.totalValue = totalValue;
             this.chipsSold = chipsSold;
             this.decksSold = decksSold;
-            this.diceSold = diceSold;
-            this.success = chipsSold > 0 || decksSold > 0 || diceSold > 0;
+            this.success = chipsSold > 0 || decksSold > 0;
         }
         
         public String getResultMessage() {
@@ -52,12 +49,6 @@ public class SellUtils {
             if (decksSold > 0) {
                 if (!first) message.append(", ");
                 message.append(decksSold).append(" deck").append(decksSold == 1 ? "" : "s");
-                first = false;
-            }
-            
-            if (diceSold > 0) {
-                if (!first) message.append(", ");
-                message.append(diceSold).append(" dice");
             }
             
             message.append(" for $").append(String.format("%.2f", totalValue));
@@ -72,7 +63,6 @@ public class SellUtils {
         double totalValue = 0.0;
         int chipsSold = 0;
         int decksSold = 0;
-        int diceSold = 0;
         
         // Check entire inventory for sellable casino items
         for (int i = 0; i < player.getInventory().main.size(); i++) {
@@ -94,18 +84,9 @@ public class SellUtils {
                 decksSold += stack.getCount();
                 player.getInventory().setStack(i, ItemStack.EMPTY);
             }
-            // Sell dice (all types)
-            else if (stack.getItem() == ModItems.FANTASY_DICE || 
-                     stack.getItem() == ModItems.SIMPLE_DICE || 
-                     stack.getItem() == ModItems.GUI_DICE) {
-                double value = DICE_SELL_PRICE * stack.getCount();
-                totalValue += value;
-                diceSold += stack.getCount();
-                player.getInventory().setStack(i, ItemStack.EMPTY);
-            }
         }
         
-        SellResult result = new SellResult(totalValue, chipsSold, decksSold, diceSold);
+        SellResult result = new SellResult(totalValue, chipsSold, decksSold);
         
         if (result.success) {
             EconomyManager.deposit(player, totalValue);
@@ -133,11 +114,6 @@ public class SellUtils {
         } else if (stack.getItem() == ModItems.CARD_DECK) {
             value = CARD_DECK_SELL_PRICE * stack.getCount();
             itemName = "card deck" + (stack.getCount() == 1 ? "" : "s");
-        } else if (stack.getItem() == ModItems.FANTASY_DICE || 
-                   stack.getItem() == ModItems.SIMPLE_DICE || 
-                   stack.getItem() == ModItems.GUI_DICE) {
-            value = DICE_SELL_PRICE * stack.getCount();
-            itemName = "dice";
         } else {
             // Not a sellable casino item
             return 0.0;
@@ -158,10 +134,7 @@ public class SellUtils {
         if (stack.isEmpty()) return false;
         
         return stack.getItem() instanceof ItemPokerChip ||
-               stack.getItem() == ModItems.CARD_DECK ||
-               stack.getItem() == ModItems.FANTASY_DICE ||
-               stack.getItem() == ModItems.SIMPLE_DICE ||
-               stack.getItem() == ModItems.GUI_DICE;
+               stack.getItem() == ModItems.CARD_DECK;
     }
     
     /**
@@ -174,10 +147,6 @@ public class SellUtils {
             return pokerChip.getValue();
         } else if (stack.getItem() == ModItems.CARD_DECK) {
             return CARD_DECK_SELL_PRICE;
-        } else if (stack.getItem() == ModItems.FANTASY_DICE ||
-                   stack.getItem() == ModItems.SIMPLE_DICE ||
-                   stack.getItem() == ModItems.GUI_DICE) {
-            return DICE_SELL_PRICE;
         }
         
         return 0.0;

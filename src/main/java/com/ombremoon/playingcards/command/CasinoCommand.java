@@ -8,12 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.ombremoon.playingcards.config.CasinoConfig;
 import com.ombremoon.playingcards.economy.EconomyManager;
 import net.minecraft.util.Formatting;
-import com.ombremoon.playingcards.util.SellUtils;
 import com.ombremoon.playingcards.economy.ServerEconomyManager;
 import com.ombremoon.playingcards.gui.CasinoMainGui;
-import com.ombremoon.playingcards.gui.ChipShopGui;
-import com.ombremoon.playingcards.item.ItemPokerChip;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -30,13 +26,7 @@ public class CasinoCommand {
         CasinoConfig config = CasinoConfig.getInstance();
         
         var casinoCommand = literal("casino")
-                .executes(CasinoCommand::openMainGui)
-                .then(literal("buy").executes(CasinoCommand::openShopGui));
-        
-        // Conditionally add sell command
-        if (config.enableSellAllCommand) {
-            casinoCommand = casinoCommand.then(literal("sell").executes(CasinoCommand::sellAllChips));
-        }
+                .executes(CasinoCommand::openMainGui);
         
         // Add balance command with conditional OP commands
         var balanceCommand = literal("balance").executes(CasinoCommand::showBalance);
@@ -59,18 +49,6 @@ public class CasinoCommand {
     private static int openMainGui(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
         new CasinoMainGui(player).open();
-        return 1;
-    }
-    
-    private static int openShopGui(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayer();
-        new ChipShopGui(player).open();
-        return 1;
-    }
-    
-    private static int sellAllChips(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayer();
-        SellUtils.sellAllCasinoItems(player);
         return 1;
     }
     
@@ -126,11 +104,6 @@ public class CasinoCommand {
         
         player.sendMessage(Text.literal("§6=== Casino Commands ==="), false);
         player.sendMessage(Text.literal("§e/casino §7- Open main casino GUI"), false);
-        player.sendMessage(Text.literal("§e/casino buy §7- Open chip shop"), false);
-        
-        if (config.enableSellAllCommand) {
-            player.sendMessage(Text.literal("§e/casino sell §7- Sell all chips"), false);
-        }
         
         player.sendMessage(Text.literal("§e/casino balance §7- Check your balance"), false);
         

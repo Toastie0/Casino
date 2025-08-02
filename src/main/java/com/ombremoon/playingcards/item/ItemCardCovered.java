@@ -47,16 +47,9 @@ public class ItemCardCovered extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
         
-        // Flip the card on both client and server
-        ItemStack newCard = flipCard(stack, user, hand);
-        
-        if (!world.isClient) {
-            // Server side - return the new card
-            return TypedActionResult.success(newCard);
-        } else {
-            // Client side - consume the action
-            return TypedActionResult.consume(newCard);
-        }
+        // Remove automatic flipping on right-click - now only left-click flips cards
+        // Right-click should pass through to allow other interactions
+        return TypedActionResult.pass(stack);
     }
 
     /**
@@ -69,10 +62,6 @@ public class ItemCardCovered extends Item {
     public ItemStack flipCard(ItemStack heldItem, PlayerEntity user, Hand hand) {
         NbtCompound nbt = ItemHelper.getNBT(heldItem);
         boolean currentCovered = nbt.getBoolean("Covered");
-        
-        // Debug logging
-        com.ombremoon.playingcards.PCReference.LOGGER.info("Flipping card: currentCovered={}, cardID={}, damage={}", 
-            currentCovered, nbt.getInt("CardID"), heldItem.getDamage());
         
         // Determine the new item type and state
         Item newItem;
@@ -95,7 +84,18 @@ public class ItemCardCovered extends Item {
         NbtCompound newNbt = ItemHelper.getNBT(newCard);
         newNbt.putInt("CardID", nbt.getInt("CardID"));
         newNbt.putByte("SkinID", nbt.getByte("SkinID"));
-        newNbt.putString("UUID", nbt.getString("UUID")); // Copy UUID as string
+        
+        // Copy UUID in the format it's stored (handle both UUID and String formats)
+        if (nbt.contains("UUID")) {
+            if (nbt.containsUuid("UUID")) {
+                // Copy as native UUID format (for cards picked up from entities)
+                newNbt.putUuid("UUID", nbt.getUuid("UUID"));
+            } else {
+                // Copy as string format (for cards drawn from decks)
+                newNbt.putString("UUID", nbt.getString("UUID"));
+            }
+        }
+        
         newNbt.putBoolean("Covered", newCovered);
         
         // Copy damage value (card ID)
@@ -111,11 +111,6 @@ public class ItemCardCovered extends Item {
             int cardId = newCard.getDamage(); // Use damage value as card ID
             newNbt.putInt("CustomModelData", 100 + cardId);
         }
-        
-        // Debug logging
-        com.ombremoon.playingcards.PCReference.LOGGER.info("Flipped to: covered={}, cardID={}, damage={}, skinID={}, customModelData={}", 
-            newCovered, newNbt.getInt("CardID"), newCard.getDamage(), newNbt.getByte("SkinID"),
-            newCard.hasNbt() && newCard.getNbt().contains("CustomModelData") ? newCard.getNbt().getInt("CustomModelData") : -1);
         
         // Replace the item in the player's hand
         user.setStackInHand(hand, newCard);
@@ -226,65 +221,61 @@ public class ItemCardCovered extends Item {
             ItemStack stack = context.getStack();
             
             try {
-                // Look for nearby decks (like original - 8 block radius)
-                java.util.List<com.ombremoon.playingcards.entity.EntityCardDeck> nearbyDecks = world.getEntitiesByClass(
+                // Check if player is directly targeting a deck entity
+                net.minecraft.util.math.Box targetBox = new net.minecraft.util.math.Box(
+                    pos.getX(), pos.getY(), pos.getZ(),
+                    pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1
+                );
+                
+                java.util.List<com.ombremoon.playingcards.entity.EntityCardDeck> targetedDecks = world.getEntitiesByClass(
                     com.ombremoon.playingcards.entity.EntityCardDeck.class,
-                    new net.minecraft.util.math.Box(pos.getX() - 8, pos.getY() - 8, pos.getZ() - 8,
-                                                   pos.getX() + 8, pos.getY() + 8, pos.getZ() + 8),
+                    targetBox,
                     deck -> true
                 );
                 
-                // Debug logging
-                com.ombremoon.playingcards.PCReference.LOGGER.info("Found {} nearby decks for card placement", nearbyDecks.size());
-                
-                NbtCompound nbt = ItemHelper.getNBT(stack);
-                java.util.UUID cardDeckUUID = null;
-                
-                // Safe UUID reading
-                if (nbt.contains("UUID")) {
-                    try {
-                        String uuidString = nbt.getString("UUID");
-                        if (!uuidString.isEmpty()) {
-                            cardDeckUUID = java.util.UUID.fromString(uuidString);
-                            com.ombremoon.playingcards.PCReference.LOGGER.info("Card UUID: {}", cardDeckUUID);
-                        }
-                    } catch (Exception ex) {
-                        // UUID is invalid, cardDeckUUID remains null
-                        com.ombremoon.playingcards.PCReference.LOGGER.warn("Invalid UUID in card: {}", ex.getMessage());
-                    }
-                } else {
-                    com.ombremoon.playingcards.PCReference.LOGGER.info("Card has no UUID in NBT");
+                // If targeting a deck directly, don't place the card - let deck handle the interaction
+                if (!targetedDecks.isEmpty()) {
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("Player targeting deck directly, passing interaction to deck");
+                    return net.minecraft.util.ActionResult.PASS;
                 }
                 
-                // Find matching deck
-                for (com.ombremoon.playingcards.entity.EntityCardDeck deck : nearbyDecks) {
-                    com.ombremoon.playingcards.PCReference.LOGGER.info("Checking deck UUID: {} vs card UUID: {}", deck.getUuid(), cardDeckUUID);
-                    if (cardDeckUUID != null && deck.getUuid().equals(cardDeckUUID)) {
-                        // Create card entity (like original)
-                        net.minecraft.util.math.Vec3d hitPos = context.getHitPos();
-                        
-                        // Safety checks before creating entity
-                        if (hitPos != null && !world.isClient) {
-                            com.ombremoon.playingcards.PCReference.LOGGER.info("Creating card entity at position: {}", hitPos);
-                            com.ombremoon.playingcards.entity.EntityCard cardEntity = new com.ombremoon.playingcards.entity.EntityCard(
-                                world, hitPos, context.getPlayerYaw(), nbt.getByte("SkinID"), 
-                                cardDeckUUID, nbt.getBoolean("Covered"), (byte) stack.getDamage()
-                            );
-                            
-                            world.spawnEntity(cardEntity);
-                            stack.decrement(1);
-                            com.ombremoon.playingcards.PCReference.LOGGER.info("Card entity spawned successfully");
+                // Not targeting a deck, place the card on the ground
+                net.minecraft.util.math.Vec3d hitPos = context.getHitPos();
+                if (hitPos != null && !world.isClient) {
+                    NbtCompound nbt = ItemHelper.getNBT(stack);
+                    
+                    // Get or preserve UUID - handle both UUID and String formats
+                    java.util.UUID cardDeckUUID = null;
+                    if (nbt.contains("UUID")) {
+                        try {
+                            // Try to read as UUID first (for cards picked up from entities)
+                            if (nbt.containsUuid("UUID")) {
+                                cardDeckUUID = nbt.getUuid("UUID");
+                            } else {
+                                // Fallback to string format (for cards drawn from decks)
+                                String uuidString = nbt.getString("UUID");
+                                if (!uuidString.isEmpty()) {
+                                    cardDeckUUID = java.util.UUID.fromString(uuidString);
+                                }
+                            }
+                        } catch (Exception ex) {
+                            // UUID is invalid, but we can still place the card
+                            com.ombremoon.playingcards.PCReference.LOGGER.warn("Invalid UUID in card, placing anyway: {}", ex.getMessage());
                         }
-                        
-                        return net.minecraft.util.ActionResult.SUCCESS;
                     }
-                }
-                
-                // If no matching deck found, log it
-                if (cardDeckUUID != null) {
-                    com.ombremoon.playingcards.PCReference.LOGGER.info("No matching deck found for card UUID: {}", cardDeckUUID);
-                } else {
-                    com.ombremoon.playingcards.PCReference.LOGGER.info("Card has no UUID, cannot place");
+                    
+                    // Create card entity regardless of UUID status
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("Placing card entity at position: {}", hitPos);
+                    com.ombremoon.playingcards.entity.EntityCard cardEntity = new com.ombremoon.playingcards.entity.EntityCard(
+                        world, hitPos, context.getPlayerYaw(), nbt.getByte("SkinID"), 
+                        cardDeckUUID, nbt.getBoolean("Covered"), (byte) stack.getDamage()
+                    );
+                    
+                    world.spawnEntity(cardEntity);
+                    stack.decrement(1);
+                    com.ombremoon.playingcards.PCReference.LOGGER.info("Card entity placed successfully");
+                    
+                    return net.minecraft.util.ActionResult.SUCCESS;
                 }
             } catch (Exception e) {
                 // Log the error and prevent crash

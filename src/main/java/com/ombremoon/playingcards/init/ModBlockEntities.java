@@ -25,7 +25,7 @@ public class ModBlockEntities {
             new Identifier(PCReference.MOD_ID, "casino_table"),
             BlockEntityType.Builder.create(
                 (pos, state) -> new CasinoTableBlockEntity(CASINO_TABLE, pos, state), 
-                ModBlocks.CASINO_TABLE
+                ModBlocks.CASINO_TABLE, ModBlocks.VIP_CASINO_TABLE, ModBlocks.POKER_POT
             ).build(null)
         );
     }

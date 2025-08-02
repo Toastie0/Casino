@@ -132,7 +132,6 @@ src/main/java/com/ombremoon/playingcards/
 ### **Phase 3: Entities & 3D (Medium Priority)**
 - [ ] 3D card entities for table placement with stacking
 - [ ] 3D poker chip entities with realistic stacking physics
-- [ ] Dice entities with throwing physics and random results
 - [ ] Custom entity rendering for all 3D objects
 
 ### **Phase 4: Game Mechanics (Low Priority)**

@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
+    "GG",
     "WW",
     "LL"
   ],
@@ -10,10 +11,13 @@
     },
     "W": {
       "tag": "minecraft:wool_carpets"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
     }
   },
   "result": {
-    "item": "casino:casino_table",
+    "item": "casino:poker_pot",
     "count": 4
   }
 }
