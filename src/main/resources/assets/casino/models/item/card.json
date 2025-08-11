@@ -4,6 +4,10 @@
     "layer0": "casino:item/cards/card_ace_spades"
   },
   "overrides": [
+    { "predicate": { "custom_model_data": 0 }, "model": "casino:item/card_base_blue" },
+    { "predicate": { "custom_model_data": 1 }, "model": "casino:item/card_base_red" },
+    { "predicate": { "custom_model_data": 2 }, "model": "casino:item/card_base_blue" },
+    { "predicate": { "custom_model_data": 3 }, "model": "casino:item/card_base_blue" },
     { "predicate": { "custom_model_data": 100 }, "model": "casino:item/cards/ace_spades" },
     { "predicate": { "custom_model_data": 101 }, "model": "casino:item/cards/ace_clubs" },
     { "predicate": { "custom_model_data": 102 }, "model": "casino:item/cards/ace_diamonds" },

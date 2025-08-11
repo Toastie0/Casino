@@ -1,2 +1,0 @@
-# This file represents where the mod icon would be placed.
-# Copy pack.png from the original mod to: src/main/resources/assets/playingcards/icon.png

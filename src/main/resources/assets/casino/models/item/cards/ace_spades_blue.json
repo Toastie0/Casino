@@ -1,0 +1,6 @@
+{
+  "parent": "casino:item/card_base_blue",
+  "textures": {
+    "0": "casino:item/cards/card_ace_spades"
+  }
+}

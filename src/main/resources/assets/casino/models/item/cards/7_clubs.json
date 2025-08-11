@@ -1,6 +1,7 @@
 {
-  "parent": "item/generated",
+  "parent": "casino:item/card_base",
   "textures": {
-    "layer0": "casino:item/cards/card_7_clubs"
+    "0": "casino:item/cards/card_7_clubs",
+    "1": "casino:item/cards/card_cover_blue"
   }
 }
